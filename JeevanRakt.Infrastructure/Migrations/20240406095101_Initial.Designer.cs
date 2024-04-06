@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JeevanRakt.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240406072400_Initial")]
+    [Migration("20240406095101_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -25,44 +25,13 @@ namespace JeevanRakt.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("JeevanRakt.Core.Domain.Entities.BloodDonation", b =>
-                {
-                    b.Property<Guid>("DonationId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("DonationBloodType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DonationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("DonationIsTested")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("DonationQuantityInMl")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("DonorId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("InventoryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("DonationId");
-
-                    b.HasIndex("DonorId");
-
-                    b.HasIndex("InventoryId");
-
-                    b.ToTable("BloodDonations");
-                });
-
             modelBuilder.Entity("JeevanRakt.Core.Domain.Entities.BloodInventory", b =>
                 {
                     b.Property<Guid>("InventoryId")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("DonorId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("InventoryBloodType")
@@ -76,6 +45,8 @@ namespace JeevanRakt.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("InventoryId");
+
+                    b.HasIndex("DonorId");
 
                     b.ToTable("BloodInventories");
                 });
@@ -155,21 +126,13 @@ namespace JeevanRakt.Infrastructure.Migrations
                     b.ToTable("Recipients");
                 });
 
-            modelBuilder.Entity("JeevanRakt.Core.Domain.Entities.BloodDonation", b =>
+            modelBuilder.Entity("JeevanRakt.Core.Domain.Entities.BloodInventory", b =>
                 {
                     b.HasOne("JeevanRakt.Core.Domain.Entities.Donor", "Donor")
-                        .WithMany("BloodDonations")
+                        .WithMany("bloodInventories")
                         .HasForeignKey("DonorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("JeevanRakt.Core.Domain.Entities.BloodInventory", "BloodInventory")
-                        .WithMany("BloodDonations")
-                        .HasForeignKey("InventoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("BloodInventory");
 
                     b.Navigation("Donor");
                 });
@@ -185,14 +148,9 @@ namespace JeevanRakt.Infrastructure.Migrations
                     b.Navigation("Recipient");
                 });
 
-            modelBuilder.Entity("JeevanRakt.Core.Domain.Entities.BloodInventory", b =>
-                {
-                    b.Navigation("BloodDonations");
-                });
-
             modelBuilder.Entity("JeevanRakt.Core.Domain.Entities.Donor", b =>
                 {
-                    b.Navigation("BloodDonations");
+                    b.Navigation("bloodInventories");
                 });
 
             modelBuilder.Entity("JeevanRakt.Core.Domain.Entities.Recipient", b =>

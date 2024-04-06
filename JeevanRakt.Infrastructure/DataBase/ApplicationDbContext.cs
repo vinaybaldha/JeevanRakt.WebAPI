@@ -21,7 +21,6 @@ namespace JeevanRakt.Infrastructure.DataBase
         public DbSet<Recipient> Recipients { get; set; }
         public DbSet<BloodInventory> BloodInventories { get; set; }
         public DbSet<BloodRequest> BloodRequests { get; set; }
-        public DbSet<BloodDonation> BloodDonations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -31,15 +30,10 @@ namespace JeevanRakt.Infrastructure.DataBase
                 .WithMany(d => d.BloodRequests)
                 .HasForeignKey(b => b.RecipientId);
 
-            modelBuilder.Entity<BloodDonation>()
-                .HasOne(r => r.Donor)
-                .WithMany(b => b.BloodDonations)
-                .HasForeignKey(r => r.DonorId);
-
-            modelBuilder.Entity<BloodDonation>()
-                .HasOne(r => r.BloodInventory)
-                .WithMany(b => b.BloodDonations)
-                .HasForeignKey(r => r.InventoryId);
+            modelBuilder.Entity<BloodInventory>()
+                .HasOne(b => b.Donor)
+                .WithMany(d => d.bloodInventories)
+                .HasForeignKey(b => b.DonorId);
 
         }
     }

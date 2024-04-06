@@ -1,18 +1,17 @@
-﻿using System;
+﻿using JeevanRakt.Core.Domain.Entities;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JeevanRakt.Core.Domain.Entities
+namespace JeevanRakt.Core.DTO.ResponseDTO
 {
-    public class BloodRequest
+    public class BloodRequestResponseDTO
     {
-        [Key]
         public Guid RequestId { get; set; }
         public Guid RecipientId { get; set; }  // Foreign key to Recipient
-        public Recipient? Recipient { get; set; }  // Navigation property
+        public RecipientResponseDTO? RecipientResponseDTO { get; set; }  // Navigation property
         public string RequestBloodType { get; set; }
         public int RequestQuantityInMl { get; set; }
         public DateTime RequestDate { get; set; }

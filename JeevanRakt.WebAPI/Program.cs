@@ -1,4 +1,5 @@
 
+using JeevanRakt.Core.Mapper;
 using JeevanRakt.Infrastructure.DataBase;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
 });
 
+//add autoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 

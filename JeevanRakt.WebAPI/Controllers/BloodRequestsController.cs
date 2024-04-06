@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using JeevanRakt.Core.Domain.Entities;
 using JeevanRakt.Infrastructure.DataBase;
+using JeevanRakt.Core.DTO.ResponseDTO;
+using AutoMapper;
 
 namespace JeevanRakt.WebAPI.Controllers
 {
@@ -15,10 +17,12 @@ namespace JeevanRakt.WebAPI.Controllers
     public class BloodRequestsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public BloodRequestsController(ApplicationDbContext context)
+        public BloodRequestsController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/BloodRequests
@@ -29,7 +33,11 @@ namespace JeevanRakt.WebAPI.Controllers
           {
               return NotFound();
           }
-            return await _context.BloodRequests.ToListAsync();
+            List<BloodRequest> bloodRequestList = await _context.BloodRequests.Include(x => x.Recipient).ToListAsync();
+
+            List<BloodRequestResponseDTO> bloodRequestResponseDTOs = _mapper.Map<List<BloodRequestResponseDTO>>(bloodRequestList);
+
+            return Ok(bloodRequestResponseDTOs);
         }
 
         // GET: api/BloodRequests/5

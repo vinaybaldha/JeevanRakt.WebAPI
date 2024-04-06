@@ -12,20 +12,6 @@ namespace JeevanRakt.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "BloodInventories",
-                columns: table => new
-                {
-                    InventoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    InventoryBloodType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    InventoryQuantityInMl = table.Column<int>(type: "int", nullable: false),
-                    InventoryExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BloodInventories", x => x.InventoryId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Donors",
                 columns: table => new
                 {
@@ -54,28 +40,20 @@ namespace JeevanRakt.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BloodDonations",
+                name: "BloodInventories",
                 columns: table => new
                 {
-                    DonationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DonorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DonationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DonationBloodType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DonationQuantityInMl = table.Column<int>(type: "int", nullable: false),
-                    DonationIsTested = table.Column<bool>(type: "bit", nullable: false),
-                    InventoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    InventoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    InventoryBloodType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    InventoryQuantityInMl = table.Column<int>(type: "int", nullable: false),
+                    InventoryExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DonorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BloodDonations", x => x.DonationId);
+                    table.PrimaryKey("PK_BloodInventories", x => x.InventoryId);
                     table.ForeignKey(
-                        name: "FK_BloodDonations_BloodInventories_InventoryId",
-                        column: x => x.InventoryId,
-                        principalTable: "BloodInventories",
-                        principalColumn: "InventoryId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_BloodDonations_Donors_DonorId",
+                        name: "FK_BloodInventories_Donors_DonorId",
                         column: x => x.DonorId,
                         principalTable: "Donors",
                         principalColumn: "DonorId",
@@ -105,14 +83,9 @@ namespace JeevanRakt.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_BloodDonations_DonorId",
-                table: "BloodDonations",
+                name: "IX_BloodInventories_DonorId",
+                table: "BloodInventories",
                 column: "DonorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BloodDonations_InventoryId",
-                table: "BloodDonations",
-                column: "InventoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BloodRequests_RecipientId",
@@ -124,13 +97,10 @@ namespace JeevanRakt.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BloodDonations");
+                name: "BloodInventories");
 
             migrationBuilder.DropTable(
                 name: "BloodRequests");
-
-            migrationBuilder.DropTable(
-                name: "BloodInventories");
 
             migrationBuilder.DropTable(
                 name: "Donors");
