@@ -9,11 +9,13 @@ namespace JeevanRakt.Core.Domain.Entities
 {
     public class Donor
     {
-        [Key]
+       
         public Guid DonorId { get; set; }
         public string DonorName { get; set; }
+        public int DonorAge { get; set; }
+        public string DonorGender { get; set; }
+        public string DonorAddress { get; set; }
         public string DonorBloodType { get; set; }
         public string DonorContactNumber { get; set; }
-        public ICollection<BloodInventory>? bloodInventories { get; set; }
     }
 }

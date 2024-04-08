@@ -1,5 +1,5 @@
 
-using JeevanRakt.Core.Mapper;
+
 using JeevanRakt.Infrastructure.DataBase;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +19,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 //add autoMapper
-builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+//add cors
+builder.Services.AddCors(option =>
+{
+    option.AddDefaultPolicy(builder1 =>
+    {
+        builder1.WithOrigins(builder.Configuration.GetSection("AllowedOrigins").Get<string[]>())
+        .WithHeaders("content-type");
+    });
+});
+
 
 var app = builder.Build();
 
@@ -28,6 +38,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    app.UseRouting();
+    app.UseCors();
 }
 
 app.UseHttpsRedirection();
