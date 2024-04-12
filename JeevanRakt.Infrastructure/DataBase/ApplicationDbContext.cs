@@ -1,4 +1,6 @@
 ﻿using JeevanRakt.Core.Domain.Entities;
+using JeevanRakt.Core.Domain.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -10,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace JeevanRakt.Infrastructure.DataBase
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -25,7 +27,8 @@ namespace JeevanRakt.Infrastructure.DataBase
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configure relationships and constraints
-            
+            base.OnModelCreating(modelBuilder);
+
 
         }
     }

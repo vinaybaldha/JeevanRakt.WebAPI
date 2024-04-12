@@ -130,6 +130,13 @@ namespace JeevanRakt.WebAPI.Controllers
             return NoContent();
         }
 
+        [HttpGet("totalbloodgroup")]
+        public async Task<ActionResult<int>> GetTotalBloodGroupsCount()
+        {
+            var totalBloodGroupCount = await _context.Bloods.CountAsync();
+            return totalBloodGroupCount;
+        }
+
         private bool BloodExists(string id)
         {
             return (_context.Bloods?.Any(e => e.BloodGroup == id)).GetValueOrDefault();
