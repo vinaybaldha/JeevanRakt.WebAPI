@@ -4,6 +4,7 @@ using JeevanRakt.Infrastructure.DataBase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JeevanRakt.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240413052555_AddJwt")]
+    partial class AddJwt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -214,25 +217,6 @@ namespace JeevanRakt.Infrastructure.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("bba83451-9c4b-423b-91b6-254ff7bfd600"),
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "f891f842-d2c9-4bf9-8b44-1031a64f7f42",
-                            Email = "admin@gmail.com",
-                            EmailConfirmed = true,
-                            EmployeeName = "admin",
-                            LockoutEnabled = false,
-                            NormalizedEmail = "ADMIN@GMAIL.COM",
-                            NormalizedUserName = "ADMIN@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEE1aLOsGy36w/FXBr+GB67YWy6M0OvhPmsMAVG6glFBihlkaKe8sOoLm8gz7A15MSg==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "9ea23889-5e1d-4d9e-b4ea-0cab5701e947",
-                            TwoFactorEnabled = false,
-                            UserName = "admin@gmail.com"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -317,13 +301,6 @@ namespace JeevanRakt.Infrastructure.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = new Guid("bba83451-9c4b-423b-91b6-254ff7bfd600"),
-                            RoleId = new Guid("839314e0-0f0d-4f97-82e3-6484e2ecca15")
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>

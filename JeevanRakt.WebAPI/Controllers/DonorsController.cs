@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using JeevanRakt.Core.Domain.Entities;
 using JeevanRakt.Infrastructure.DataBase;
+using Microsoft.AspNetCore.Authorization;
 
 namespace JeevanRakt.WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class DonorsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;

@@ -1,5 +1,6 @@
 ﻿using JeevanRakt.Core.Domain.Identity;
 using JeevanRakt.Core.DTO;
+using JeevanRakt.Core.ServiceContracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,13 +16,15 @@ namespace JeevanRakt.WebAPI.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly IJwtService _jwtService;
 
 
-        public AccountController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, SignInManager<ApplicationUser> signInManager)
+        public AccountController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, SignInManager<ApplicationUser> signInManager, IJwtService jwtService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
+            _jwtService = jwtService;
         }
 
         /// <summary>
@@ -31,12 +34,13 @@ namespace JeevanRakt.WebAPI.Controllers
         /// <returns></returns>
         [HttpPost("register")]
         [AllowAnonymous]
+        [Authorize(Roles ="Admin")]
         public async Task<ActionResult<ApplicationUser>> PostRegister(RegisterDTO registerDTO)
         {
             if (registerDTO == null)
             {
                 return NotFound();//http 404
-            }
+            } 
 
             //Validation
             if (!ModelState.IsValid)
@@ -133,10 +137,10 @@ namespace JeevanRakt.WebAPI.Controllers
             {
                 return BadRequest("something went wrong");
             }
-           
 
-            return Ok(user);
+            AuthenticationResponse authenticationResponse = _jwtService.CreateJwtToken(user, roles.ToList());
 
+            return Ok(authenticationResponse);
 
         }
 
