@@ -157,8 +157,8 @@ namespace JeevanRakt.WebAPI.Controllers
             return NoContent();
         }
 
-        [HttpPost("forgot-password")]
-        [AllowAnonymous]
+        //[HttpPost("forgot-password")]
+        //[AllowAnonymous]
 
         //public async Task<IActionResult> ForgotPassword([FromForm][Required] string email)
         //{
@@ -228,5 +228,25 @@ namespace JeevanRakt.WebAPI.Controllers
             var totalUsersCount = await _userManager.Users.CountAsync();
             return totalUsersCount;
         }
+
+        [HttpGet("getroles/{email}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetUserRoles(string email)
+        {
+            // Get the user by userId
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                // User not found
+                return NotFound();
+            }
+
+            // Get the roles assigned to the user
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return Ok(roles);
+        }
+
     }
 }

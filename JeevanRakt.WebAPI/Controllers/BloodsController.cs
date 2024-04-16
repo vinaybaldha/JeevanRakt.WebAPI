@@ -13,7 +13,7 @@ namespace JeevanRakt.WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public class BloodsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
