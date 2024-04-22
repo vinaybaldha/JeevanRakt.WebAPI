@@ -1,15 +1,18 @@
 
 
 using JeevanRakt.Core.Domain.Identity;
+using JeevanRakt.Core.Domain.RepositoryContracts;
 using JeevanRakt.Core.ServiceContracts;
 using JeevanRakt.Core.Services;
 using JeevanRakt.Infrastructure.DataBase;
+using JeevanRakt.Infrastructure.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -53,6 +56,9 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 
 //add services
 builder.Services.AddTransient<IJwtService, JwtService>();
+builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.AddScoped<IImageRepository, LocalImageRepository>();
+builder.Services.AddScoped<IBloodBankService, BloodBankService>();
 
 //add cors
 builder.Services.AddCors(option =>
@@ -109,6 +115,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles(
+        new StaticFileOptions
+        {
+            FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Images")),
+            RequestPath = "/Images"
+        }
+    );
 
 app.UseAuthentication();
 

@@ -4,6 +4,7 @@ using JeevanRakt.Infrastructure.DataBase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JeevanRakt.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240418073923_image upload")]
+    partial class imageupload
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,31 +36,6 @@ namespace JeevanRakt.Infrastructure.Migrations
                     b.HasKey("BloodGroup");
 
                     b.ToTable("Bloods");
-                });
-
-            modelBuilder.Entity("JeevanRakt.Core.Domain.Entities.BloodBank", b =>
-                {
-                    b.Property<Guid>("BloodBankId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BloodBankName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("Latitude")
-                        .HasColumnType("float");
-
-                    b.Property<double>("Longitude")
-                        .HasColumnType("float");
-
-                    b.HasKey("BloodBankId");
-
-                    b.ToTable("BloodBanks");
                 });
 
             modelBuilder.Entity("JeevanRakt.Core.Domain.Entities.Donor", b =>
@@ -274,16 +252,16 @@ namespace JeevanRakt.Infrastructure.Migrations
                         {
                             Id = new Guid("bba83451-9c4b-423b-91b6-254ff7bfd600"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2cfe254f-3766-4782-957a-3aa92ec52a22",
+                            ConcurrencyStamp = "dbeb407d-ed9d-4830-b4f5-dae452c51df2",
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
                             EmployeeName = "admin",
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEICVerqBmbIuJ34k48fNrFA+pvs8ZdqLRtoOW33zpRHWFqq0M1IhwGGxyWiwyXceWw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBuaBG00cz1mJB3wJVp4tVzNfty+GAM4fckkAQNIl4VjPqyjWg90g3QSsmtky2JjaQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "90ba485a-84dd-4a50-8fb2-414af2934637",
+                            SecurityStamp = "07cae45f-2eb2-41f2-a0ba-7e3299d2b33a",
                             TwoFactorEnabled = false,
                             UserName = "admin@gmail.com"
                         });

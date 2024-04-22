@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace JeevanRakt.Core.DTO
@@ -23,6 +24,7 @@ namespace JeevanRakt.Core.DTO
         [Required(ErrorMessage = "Confirm Password can't be blank")]
         [Compare("Password", ErrorMessage = "Password and Confirm Password do not match")]
         public string? ConfirmPassword { get; set; }
+
 
     }
 }

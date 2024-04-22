@@ -122,7 +122,7 @@ namespace JeevanRakt.WebAPI.Controllers
         public async Task<ActionResult<int>> GetTotalDonorsCount()
         {
             var totalDonorsCount = await _context.Donors.CountAsync();
-            return totalDonorsCount;
+            return Ok(totalDonorsCount);
         }
 
         private bool DonorExists(Guid id)

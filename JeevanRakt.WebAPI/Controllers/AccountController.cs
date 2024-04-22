@@ -1,11 +1,11 @@
-﻿using JeevanRakt.Core.Domain.Identity;
+﻿using JeevanRakt.Core.Domain.Entities;
+using JeevanRakt.Core.Domain.Identity;
+using JeevanRakt.Core.Domain.RepositoryContracts;
 using JeevanRakt.Core.DTO;
 using JeevanRakt.Core.ServiceContracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 
 namespace JeevanRakt.WebAPI.Controllers
 {
@@ -15,16 +15,18 @@ namespace JeevanRakt.WebAPI.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly IJwtService _jwtService;
+        private readonly IEmailSender _emailSender;
+        private readonly IImageRepository _imageRepository;
 
 
-        public AccountController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, SignInManager<ApplicationUser> signInManager, IJwtService jwtService)
+        public AccountController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, SignInManager<ApplicationUser> signInManager, IJwtService jwtService, IEmailSender emailSender, IImageRepository imageRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _roleManager = roleManager;
             _jwtService = jwtService;
+            _emailSender = emailSender;
+            _imageRepository = imageRepository;
         }
 
         /// <summary>
@@ -34,7 +36,7 @@ namespace JeevanRakt.WebAPI.Controllers
         /// <returns></returns>
         [HttpPost("register")]
         [AllowAnonymous]
-        [Authorize(Roles ="Admin")]
+        //[Authorize(Roles ="Admin")]
         public async Task<ActionResult<ApplicationUser>> PostRegister(RegisterDTO registerDTO)
         {
             if (registerDTO == null)
@@ -50,6 +52,7 @@ namespace JeevanRakt.WebAPI.Controllers
                 return Problem(errorMessage);
             }
 
+         
 
             //create user
             ApplicationUser user = new ApplicationUser()
@@ -140,6 +143,8 @@ namespace JeevanRakt.WebAPI.Controllers
 
             AuthenticationResponse authenticationResponse = _jwtService.CreateJwtToken(user, roles.ToList());
 
+            authenticationResponse.FilePath = user.FilePath;
+
             return Ok(authenticationResponse);
 
         }
@@ -157,62 +162,66 @@ namespace JeevanRakt.WebAPI.Controllers
             return NoContent();
         }
 
-        //[HttpPost("forgot-password")]
-        //[AllowAnonymous]
+        [HttpPost("forgot-password")]
+        [AllowAnonymous]
 
-        //public async Task<IActionResult> ForgotPassword([FromForm][Required] string email)
-        //{
-        //    var user = await _userManager.FindByEmailAsync(email);
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+        {
+            string? email = request.Email;
 
-        //    if (user == null) { return BadRequest("email is not registered"); }
+            if(email == null) { return NotFound("email is not found"); }
 
-        //    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var user = await _userManager.FindByEmailAsync(email);
 
-        //    var forgotPasswordLink = Url.Action(nameof(ResetPassword), "Account", new { token, email = user.Email }, Request.Scheme);
+            if (user == null) { return BadRequest("email is not registered"); }
 
-        //    if (forgotPasswordLink == null) { return BadRequest("forgot password link is not generated"); }
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-        //    await _emailSender.SendEmailAsync(email, "Forgot Password Link", forgotPasswordLink);
+            var forgotPasswordLink = $"http://localhost:4200/reset-password?token={token}&email={email}";
 
-        //    return Ok($"Password reset link is send to your email {email}");
+            if (forgotPasswordLink == null) { return BadRequest("forgot password link is not generated"); }
 
+            await _emailSender.SendEmailAsync(email, "Forgot Password Link", forgotPasswordLink);
 
-        //}
-
-        //[HttpGet("reset-password")]
-        //[AllowAnonymous]
-        //public async Task<IActionResult> ResetPassword(string token, string email)
-        //{
-        //    var model = new ResetPasswordDTO { Token = token, Email = email };
-
-        //    return Ok(model);
-        //}
+            return Ok($"Password reset link is send to your email {email}");
 
 
-        //[HttpPost("reset-password")]
-        //[AllowAnonymous]
-        //public async Task<IActionResult> ResetPassword(ResetPasswordDTO resetPasswordDTO)
-        //{
-        //    if (resetPasswordDTO == null || resetPasswordDTO.Email == null) { return BadRequest(); }
+        }
 
-        //    var user = await _userManager.FindByEmailAsync(resetPasswordDTO.Email);
+        [HttpGet("reset-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPassword(string token, string email)
+        {
+            var model = new ResetPasswordDTO { Token = token, Email = email };
 
-        //    if (user == null) { BadRequest("user is not valid"); }
+            return Ok(model);
+        }
 
-        //    var resetPassword = await _userManager.ResetPasswordAsync(user, resetPasswordDTO.Token, resetPasswordDTO.Password);
 
-        //    if (!resetPassword.Succeeded)
-        //    {
-        //        foreach (var error in resetPassword.Errors)
-        //        {
-        //            ModelState.AddModelError(error.Code, error.Description);
-        //        }
-        //        return BadRequest(ModelState);
-        //    }
+        [HttpPost("reset-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDTO resetPasswordDTO)
+        {
+            if (resetPasswordDTO == null || resetPasswordDTO.Email == null) { return BadRequest(); }
 
-        //    return Ok("password has been changed");
+            var user = await _userManager.FindByEmailAsync(resetPasswordDTO.Email);
 
-        //}
+            if (user == null) { BadRequest("user is not valid"); }
+            resetPasswordDTO.Token = resetPasswordDTO.Token.Replace(" ", "+");
+            var resetPassword = await _userManager.ResetPasswordAsync(user, resetPasswordDTO.Token, resetPasswordDTO.Password);
+
+            if (!resetPassword.Succeeded)
+            {
+                foreach (var error in resetPassword.Errors)
+                {
+                    ModelState.AddModelError(error.Code, error.Description);
+                }
+                return BadRequest(ModelState);
+            }
+
+            return Ok("password has been changed");
+
+        }
 
         [HttpGet("users")]
         [Authorize(Roles = "Admin")]
@@ -225,8 +234,9 @@ namespace JeevanRakt.WebAPI.Controllers
         [HttpGet("totalusers")]
         public async Task<ActionResult<int>> GetTotalUsersCount()
         {
-            var totalUsersCount = await _userManager.Users.CountAsync();
-            return totalUsersCount;
+            //var totalUsersCount = await _userManager.Users.CountAsync();
+            //return totalUsersCount;
+            return Ok();
         }
 
         [HttpGet("getroles/{email}")]
@@ -246,6 +256,98 @@ namespace JeevanRakt.WebAPI.Controllers
             var roles = await _userManager.GetRolesAsync(user);
 
             return Ok(roles);
+        }
+
+        [HttpPost("upload")]
+        [Authorize]
+        public async Task<IActionResult> Upload([FromForm]ImageUploadRequestDTO request)
+        {
+            ValidateFileUpload(request);
+
+
+            if (ModelState.IsValid)
+            {
+               
+                //Convert DTO to model
+                var imageDomainModel = new Image
+                {
+                    File = request.File,
+                    FileExtension = Path.GetExtension(request.File.FileName),
+                    FileSizeInBytes = request.File.Length,
+                    FileName = request.FileName,
+                };
+
+
+                //user repository to upload image
+                await _imageRepository.Upload(imageDomainModel);
+
+                ApplicationUser? user = await _userManager.GetUserAsync(User);
+
+                if(user == null) { return  NotFound("user not found"); }
+
+                user.FilePath = imageDomainModel.FilePath;
+
+                var result = await _userManager.UpdateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    return Ok(new { imageDomainModel.FilePath });
+                }
+                else
+                {
+                    return BadRequest("Failed to update user profile.");
+                }
+
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
+            
+        }
+
+        private void ValidateFileUpload(ImageUploadRequestDTO request)
+        {
+            var allowExtensions = new string[] { ".jpg", ".jpeg", ".png" };
+
+            if (!allowExtensions.Contains(Path.GetExtension(request.File.FileName)))
+            {
+                ModelState.AddModelError("file", "Unsupported file extension");
+            }
+
+            if (request.File.Length > 10485760)
+            {
+                ModelState.AddModelError("file", "file size is more than 10MB, please upload a smaller size file");
+            }
+        }
+
+        [HttpPut("user")]
+        [Authorize]
+        public async Task<ActionResult<int>> UpdateUser(ApplicationUser updatedUser)
+        {
+            ApplicationUser? user = await _userManager.GetUserAsync(User);
+
+            if(user == null) { return NotFound("user not found"); }
+
+            user.EmployeeName = updatedUser.EmployeeName;
+            user.PhoneNumber = updatedUser.PhoneNumber;
+            user.Email = updatedUser.Email;
+
+            await _userManager.UpdateAsync(user);
+
+            return Ok(user);
+        }
+
+
+        [HttpGet("user")]
+        [Authorize]
+        public async Task<ActionResult<int>> GetUser()
+        {
+            ApplicationUser? user = await _userManager.GetUserAsync(User);
+
+            if (user == null) { return NotFound("user not found"); }
+
+            return Ok(user);
         }
 
     }

@@ -27,4 +27,8 @@
     <ProjectReference Include="..\JeevanRakt.Infrastructure\JeevanRakt.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Images\" />
+  </ItemGroup>
+
 </Project>
