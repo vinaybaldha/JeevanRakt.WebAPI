@@ -115,7 +115,7 @@ namespace JeevanRakt.WebAPI.Controllers
             _context.Donors.Remove(donor);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(donor);
         }
 
         [HttpGet("totaldonors")]
