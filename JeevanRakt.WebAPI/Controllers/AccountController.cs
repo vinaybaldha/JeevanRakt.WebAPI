@@ -350,5 +350,16 @@ namespace JeevanRakt.WebAPI.Controllers
             return Ok(user);
         }
 
+        [HttpGet("user/valid")]
+        [AllowAnonymous]
+        public async Task<ActionResult<int>> IsUserDuplicate([FromQuery] string username)
+        {
+            ApplicationUser? user = await _userManager.FindByNameAsync(username);
+
+            if (user == null) { return Ok(false); }
+
+            return Ok(true);
+        }
+
     }
 }
