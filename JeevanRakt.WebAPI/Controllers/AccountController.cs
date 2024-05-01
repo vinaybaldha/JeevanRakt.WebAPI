@@ -3,9 +3,11 @@ using JeevanRakt.Core.Domain.Identity;
 using JeevanRakt.Core.Domain.RepositoryContracts;
 using JeevanRakt.Core.DTO;
 using JeevanRakt.Core.ServiceContracts;
+using JeevanRakt.Infrastructure.DataBase;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace JeevanRakt.WebAPI.Controllers
 {
@@ -18,15 +20,17 @@ namespace JeevanRakt.WebAPI.Controllers
         private readonly IJwtService _jwtService;
         private readonly IEmailSender _emailSender;
         private readonly IImageRepository _imageRepository;
+        private readonly ApplicationDbContext _context;
 
 
-        public AccountController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, SignInManager<ApplicationUser> signInManager, IJwtService jwtService, IEmailSender emailSender, IImageRepository imageRepository)
+        public AccountController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, SignInManager<ApplicationUser> signInManager, IJwtService jwtService, IEmailSender emailSender, IImageRepository imageRepository, ApplicationDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtService = jwtService;
             _emailSender = emailSender;
             _imageRepository = imageRepository;
+            _context = context;
         }
 
         /// <summary>
@@ -73,6 +77,10 @@ namespace JeevanRakt.WebAPI.Controllers
 
                 return Problem(errorMessage);
             }
+
+            IdentityResult result2 = await _userManager.AddToRoleAsync(user, "User");
+
+            if (!result2.Succeeded) { return NotFound(); }
 
             return Ok(registerDTO);
 
@@ -144,6 +152,7 @@ namespace JeevanRakt.WebAPI.Controllers
             AuthenticationResponse authenticationResponse = _jwtService.CreateJwtToken(user, roles.ToList());
 
             authenticationResponse.FilePath = user.FilePath;
+            authenticationResponse.Role = roles[0];
 
             return Ok(authenticationResponse);
 
@@ -359,6 +368,23 @@ namespace JeevanRakt.WebAPI.Controllers
             if (user == null) { return Ok(false); }
 
             return Ok(true);
+        }
+
+        [HttpGet("user/roleaccess")]
+        [AllowAnonymous]
+        public async Task<ActionResult> RoleAccessMenus([FromQuery] string userrole, string? menu)
+       {
+            if (menu == null)
+            {
+                List<RoleAccess> menus = await _context.RoleAccesses.Where(x => x.Role == userrole).ToListAsync();
+
+                return Ok(menus);
+            }
+
+            List<RoleAccess> menus1 = await _context.RoleAccesses.Where(x=>x.Role == userrole && x.Menu == menu).ToListAsync();  
+
+            return Ok(menus1);
+            
         }
 
     }

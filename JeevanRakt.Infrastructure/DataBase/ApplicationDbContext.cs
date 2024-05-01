@@ -25,6 +25,9 @@ namespace JeevanRakt.Infrastructure.DataBase
         public DbSet<Blood> Bloods { get; set; }
         public virtual DbSet<Core.Domain.Entities.Image> Images { get; set; }
         public DbSet<BloodBank> BloodBanks { get; set; }
+        public DbSet<Menu> Menus { get; set; }
+        public DbSet<RoleAccess> RoleAccesses { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
