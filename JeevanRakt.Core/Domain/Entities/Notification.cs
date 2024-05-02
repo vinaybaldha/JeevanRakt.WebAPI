@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace JeevanRakt.Core.Domain.Entities
 {
-    public class Blood
+    public class Notification
     {
-        [Key]
-        public string? BloodGroup { get; set; }
-        public int BloodStock { get; set; }
+        public string ProductID { get; set; }
+        public string ProductName { get; set; }
+        public string Message { get; set; }
     }
 }

@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,16 +62,17 @@ builder.Services.AddScoped<IImageRepository, LocalImageRepository>();
 builder.Services.AddScoped<IBloodBankService, BloodBankService>();
 
 //add cors
-builder.Services.AddCors(option =>
+builder.Services.AddCors(option => option.AddPolicy("CorsPolicy", builder =>
 {
-    option.AddDefaultPolicy(builder1 =>
-    {
-        builder1.WithOrigins(builder.Configuration.GetSection("AllowedOrigins").Get<string[]>())
-        .WithHeaders("Authorization", "origin", "accept", "content-type")
-        .WithMethods("GET", "POST", "PUT", "DELETE");
-    });
-});
+    builder.AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowAnyOrigin()
+    .AllowCredentials()
+    .WithOrigins("http://localhost:4200");
+}));
 
+builder.Services.AddSignalR();
+builder.Services.AddMvc().SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Latest);
 //add authentication service
 builder.Services.AddAuthentication(options =>
 {
@@ -111,8 +113,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 
     app.UseRouting();
-    app.UseCors();
+    
+
+    
 }
+app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
 
@@ -130,5 +135,7 @@ app.UseAuthorization();
 
 
 app.MapControllers();
+
+app.MapHub<ProductNotificationHub>("/Notify");
 
 app.Run();

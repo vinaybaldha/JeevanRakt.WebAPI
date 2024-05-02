@@ -21,6 +21,7 @@ namespace JeevanRakt.WebAPI.Controllers
         private readonly IEmailSender _emailSender;
         private readonly IImageRepository _imageRepository;
         private readonly ApplicationDbContext _context;
+        private readonly RoleManager<ApplicationRole> _roleManager;
 
 
         public AccountController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, SignInManager<ApplicationUser> signInManager, IJwtService jwtService, IEmailSender emailSender, IImageRepository imageRepository, ApplicationDbContext context)
@@ -31,6 +32,7 @@ namespace JeevanRakt.WebAPI.Controllers
             _emailSender = emailSender;
             _imageRepository = imageRepository;
             _context = context;
+            _roleManager = roleManager;
         }
 
         /// <summary>
@@ -237,15 +239,39 @@ namespace JeevanRakt.WebAPI.Controllers
         public IActionResult AllUser()
         {
             List<ApplicationUser> users = _userManager.Users.ToList();
+
+            // Create a list to store user information along with their roles
+            //List<UserResponseDTO> usersWithRoles = new List<UserResponseDTO>();
+
+            //// Iterate through each user to get their roles
+            //foreach (var user in users)
+            //{
+            //    // Get roles for the user
+            //    IList<string> roles = _userManager.GetRolesAsync(user).Result;
+
+            //    // Create a DTO object to hold user information and roles
+            //    var userWithRoles = new UserResponseDTO
+            //    {
+                    
+            //        EmployeeName = user.EmployeeName,
+            //        Email = user.Email,
+            //        PhoneNumber = user.PhoneNumber,
+            //        Role = roles
+            //    };
+
+            //    // Add the DTO object to the list
+            //    usersWithRoles.Add(userWithRoles);
+            //}
+
             return Ok(users);
         }
 
         [HttpGet("totalusers")]
         public async Task<ActionResult<int>> GetTotalUsersCount()
         {
-            //var totalUsersCount = await _userManager.Users.CountAsync();
-            //return totalUsersCount;
-            return Ok();
+            var totalUsersCount = await _userManager.Users.CountAsync();
+            return totalUsersCount;
+            
         }
 
         [HttpGet("getroles/{email}")]
