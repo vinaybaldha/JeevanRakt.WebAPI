@@ -2,7 +2,6 @@
 using JeevanRakt.Core.Domain.RepositoryContracts;
 using JeevanRakt.Core.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
@@ -29,7 +28,7 @@ namespace JeevanRakt.WebAPI.Controllers
             {
                 ProductID = "1",
                 ProductName = "vinay",
-                Message = "Product Updated"
+                Message = "Notification Added"
             });
         }
     }

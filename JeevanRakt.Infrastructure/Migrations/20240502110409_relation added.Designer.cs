@@ -4,6 +4,7 @@ using JeevanRakt.Infrastructure.DataBase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JeevanRakt.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240502110409_relation added")]
+    partial class relationadded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -98,7 +101,7 @@ namespace JeevanRakt.Infrastructure.Migrations
                     b.HasIndex("BloodBankId")
                         .IsUnique();
 
-                    b.ToTable("BloodInventories");
+                    b.ToTable("BloodInventory");
                 });
 
             modelBuilder.Entity("JeevanRakt.Core.Domain.Entities.Donor", b =>
@@ -283,9 +286,6 @@ namespace JeevanRakt.Infrastructure.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("BloodBankId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -338,8 +338,6 @@ namespace JeevanRakt.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BloodBankId");
-
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -355,16 +353,16 @@ namespace JeevanRakt.Infrastructure.Migrations
                         {
                             Id = new Guid("bba83451-9c4b-423b-91b6-254ff7bfd600"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "58c49942-d5c6-4b15-9a56-878e4333e07b",
+                            ConcurrencyStamp = "9339cb5c-8464-4a93-bd79-f5565dba012a",
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
                             EmployeeName = "admin",
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEA8n1vuYe9lMtu9aJ2bcnLnf5hgfz2UwIDQy3prU/jTc8RWk8KY1557p0Cx2XKQs4Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOIblJ0L1iCmUChtdd3b+XwJZ+CacmmKenySyrkYlt43nZz2sZW0Wx+WgizsU+C7Mw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "dddaa798-0037-46b8-a337-3b9d9e8cbcfb",
+                            SecurityStamp = "b54a2bed-2af0-46d1-8400-b525f8c73cbc",
                             TwoFactorEnabled = false,
                             UserName = "admin@gmail.com"
                         });
@@ -513,15 +511,6 @@ namespace JeevanRakt.Infrastructure.Migrations
                     b.Navigation("BloodBank");
                 });
 
-            modelBuilder.Entity("JeevanRakt.Core.Domain.Identity.ApplicationUser", b =>
-                {
-                    b.HasOne("JeevanRakt.Core.Domain.Entities.BloodBank", "BloodBank")
-                        .WithMany("Users")
-                        .HasForeignKey("BloodBankId");
-
-                    b.Navigation("BloodBank");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("JeevanRakt.Core.Domain.Identity.ApplicationRole", null)
@@ -580,8 +569,6 @@ namespace JeevanRakt.Infrastructure.Migrations
                     b.Navigation("Donors");
 
                     b.Navigation("Recipients");
-
-                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,61 +1,46 @@
-﻿using JeevanRakt.Core.Domain.Entities;
-using JeevanRakt.Core.Domain.RepositoryContracts;
-using JeevanRakt.Infrastructure.DataBase;
-using JeevanRakt.Infrastructure.Repository;
-using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using back_end.DatabaseContext;
+using back_end.Domain.Entities;
 
-namespace JeevanRakt.WebAPI.Controllers
+namespace back_end.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class BloodBanksController : ControllerBase
     {
-        private readonly IBloodBankService _bloodBankService;
         private readonly ApplicationDbContext _context;
 
-        public BloodBanksController(IBloodBankService bloodBankService, ApplicationDbContext context)
+        public BloodBanksController(ApplicationDbContext context)
         {
-            _bloodBankService = bloodBankService;
             _context = context;
-        }
-
-        [HttpGet("nearest")]
-        [AllowAnonymous]
-        public IActionResult GetNearestBloodBank(double userLatitude, double userLongitude)
-        {
-            var nearestBloodBank = _bloodBankService.FindNearestBloodBank(userLatitude, userLongitude);
-
-            if (nearestBloodBank == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(nearestBloodBank);
         }
 
         // GET: api/BloodBanks
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BloodBank>>> GetBloodBanks()
         {
-            if (_context.BloodBanks == null)
-            {
-                return NotFound();
-            }
-            return await _context.BloodBanks.Include(x=>x.Donors).Include(x=>x.Recipients).ToListAsync();
+          if (_context.BloodBanks == null)
+          {
+              return NotFound();
+          }
+            return await _context.BloodBanks.ToListAsync();
         }
 
         // GET: api/BloodBanks/5
         [HttpGet("{id}")]
         public async Task<ActionResult<BloodBank>> GetBloodBank(Guid id)
         {
-            if (_context.BloodBanks == null)
-            {
-                return NotFound();
-            }
-            var bloodBank = await _context.BloodBanks.Include(x=>x.Donors).Include(x => x.Recipients).FirstOrDefaultAsync(x=>x.BloodBankId==id);
+          if (_context.BloodBanks == null)
+          {
+              return NotFound();
+          }
+            var bloodBank = await _context.BloodBanks.FindAsync(id);
 
             if (bloodBank == null)
             {
@@ -101,10 +86,10 @@ namespace JeevanRakt.WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<BloodBank>> PostBloodBank(BloodBank bloodBank)
         {
-            if (_context.BloodBanks == null)
-            {
-                return Problem("Entity set 'ApplicationDbContext.BloodBanks'  is null.");
-            }
+          if (_context.BloodBanks == null)
+          {
+              return Problem("Entity set 'ApplicationDbContext.BloodBanks'  is null.");
+          }
             _context.BloodBanks.Add(bloodBank);
             await _context.SaveChangesAsync();
 

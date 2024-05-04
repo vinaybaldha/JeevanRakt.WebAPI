@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace JeevanRakt.Core.Domain.Entities
@@ -17,5 +18,9 @@ namespace JeevanRakt.Core.Domain.Entities
         public string DonorAddress { get; set; }
         public string DonorBloodType { get; set; }
         public string DonorContactNumber { get; set; }
+
+        public Guid BloodBankId { get; set; }
+        [JsonIgnore]
+        public BloodBank? BloodBank { get; set; }
     }
 }

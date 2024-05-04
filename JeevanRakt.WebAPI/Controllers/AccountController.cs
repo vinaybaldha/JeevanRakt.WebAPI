@@ -155,6 +155,12 @@ namespace JeevanRakt.WebAPI.Controllers
 
             authenticationResponse.FilePath = user.FilePath;
             authenticationResponse.Role = roles[0];
+            if(user.BloodBankId != null)
+            {
+                authenticationResponse.BloodBankId = (Guid)user.BloodBankId;
+            }
+            
+          
 
             return Ok(authenticationResponse);
 

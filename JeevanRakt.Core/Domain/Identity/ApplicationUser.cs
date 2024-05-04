@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using JeevanRakt.Core.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace JeevanRakt.Core.Domain.Identity
@@ -13,5 +15,8 @@ namespace JeevanRakt.Core.Domain.Identity
         public string? EmployeeName { get; set; }
 
         public string? FilePath { get; set; }
+        public Guid? BloodBankId { get; set; }
+        [JsonIgnore]
+        public BloodBank? BloodBank { get; set; }
     }
 }

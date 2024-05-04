@@ -27,6 +27,7 @@ namespace JeevanRakt.Infrastructure.DataBase
         public DbSet<BloodBank> BloodBanks { get; set; }
         public DbSet<Menu> Menus { get; set; }
         public DbSet<RoleAccess> RoleAccesses { get; set; }
+        public DbSet<BloodInventory> BloodInventories { get; set; }
 
 
 
@@ -34,6 +35,9 @@ namespace JeevanRakt.Infrastructure.DataBase
         {
             // Configure relationships and constraints
             base.OnModelCreating(modelBuilder);
+
+            //add relationship
+       
 
             //add roles
 

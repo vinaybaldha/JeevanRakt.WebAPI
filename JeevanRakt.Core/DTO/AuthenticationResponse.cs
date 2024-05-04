@@ -1,4 +1,6 @@
-﻿namespace JeevanRakt.Core.DTO
+﻿using JeevanRakt.Core.Domain.Entities;
+
+namespace JeevanRakt.Core.DTO
 {
     public class AuthenticationResponse
     {
@@ -11,5 +13,6 @@
         public string? FilePath { get; set; }
 
         public Guid UserId { get; set; }
+        public Guid? BloodBankId { get; set; }
     }
 }
