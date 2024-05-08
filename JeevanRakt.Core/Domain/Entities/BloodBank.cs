@@ -23,9 +23,8 @@ namespace JeevanRakt.Core.Domain.Entities
 
         public ICollection<Donor>? Donors { get; set; }
         public ICollection<Recipient>? Recipients { get; set;}
-        
+        [ForeignKey("BloodBankId")]
         public BloodInventory? BloodInventory { get; set; }
-        public ICollection<ApplicationUser>? Users { get; set; }
         
     }
 }

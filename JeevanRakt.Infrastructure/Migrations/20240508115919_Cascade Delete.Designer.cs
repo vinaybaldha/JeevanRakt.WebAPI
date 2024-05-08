@@ -4,6 +4,7 @@ using JeevanRakt.Infrastructure.DataBase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JeevanRakt.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240508115919_Cascade Delete")]
+    partial class CascadeDelete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -353,16 +356,16 @@ namespace JeevanRakt.Infrastructure.Migrations
                         {
                             Id = new Guid("bba83451-9c4b-423b-91b6-254ff7bfd600"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "462cbf09-5d58-4180-acde-4bca625c22b1",
+                            ConcurrencyStamp = "678cae65-bae4-4201-b130-19aa03496bb6",
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
                             EmployeeName = "admin",
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEC7k8lDQ9oRGCXSAP+TcfnwhWp/qt7C5NTsCjvOJ8ExZuHfyzvGnRyjtQ5MrSINlkA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJokdQvjZfcxV4b9GfCGVKDMnHhNLi2GI5isckSQru1sTbRKBDtNTNoS07j5K3se8g==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "f146b7db-ea05-44ae-a341-d811132089e9",
+                            SecurityStamp = "bfd14af4-f1d8-4239-872a-1f1dfcaccaec",
                             TwoFactorEnabled = false,
                             UserName = "admin@gmail.com"
                         });
@@ -483,7 +486,7 @@ namespace JeevanRakt.Infrastructure.Migrations
                     b.HasOne("JeevanRakt.Core.Domain.Entities.BloodBank", "BloodBank")
                         .WithOne("BloodInventory")
                         .HasForeignKey("JeevanRakt.Core.Domain.Entities.BloodInventory", "BloodBankId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.Navigation("BloodBank");
@@ -494,7 +497,7 @@ namespace JeevanRakt.Infrastructure.Migrations
                     b.HasOne("JeevanRakt.Core.Domain.Entities.BloodBank", "BloodBank")
                         .WithMany("Donors")
                         .HasForeignKey("BloodBankId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.Navigation("BloodBank");
@@ -505,7 +508,7 @@ namespace JeevanRakt.Infrastructure.Migrations
                     b.HasOne("JeevanRakt.Core.Domain.Entities.BloodBank", "BloodBank")
                         .WithMany("Recipients")
                         .HasForeignKey("BloodBankId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.Navigation("BloodBank");

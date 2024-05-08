@@ -37,7 +37,26 @@ namespace JeevanRakt.Infrastructure.DataBase
             base.OnModelCreating(modelBuilder);
 
             //add relationship
-       
+            modelBuilder.Entity<Donor>()
+     .HasOne<BloodBank>(e => e.BloodBank)
+     .WithMany(d => d.Donors)
+     .HasForeignKey(e => e.BloodBankId)
+     .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Recipient>()
+    .HasOne<BloodBank>(e => e.BloodBank)
+    .WithMany(d => d.Recipients)
+    .HasForeignKey(e => e.BloodBankId)
+    .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<BloodBank>()
+         .HasOne(b => b.BloodInventory)
+         .WithOne(i => i.BloodBank)
+         .HasForeignKey<BloodInventory>(i => i.BloodBankId)
+         .OnDelete(DeleteBehavior.Cascade);
+
+
+
 
             //add roles
 

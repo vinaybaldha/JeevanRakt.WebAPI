@@ -19,9 +19,10 @@ namespace JeevanRakt.Core.Domain.Entities
         public int AB2 { get; set; }
         public int O1 { get; set; }
         public int O2 { get; set; }
-        [ForeignKey(nameof(BloodBank))]
+       
         public Guid BloodBankId { get; set; }
         [JsonIgnore]
+        [ForeignKey("BloodBankId")]
         public BloodBank? BloodBank { get; set; }
     }
 }

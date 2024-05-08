@@ -16,7 +16,5 @@ namespace JeevanRakt.Core.Domain.Identity
 
         public string? FilePath { get; set; }
         public Guid? BloodBankId { get; set; }
-        [JsonIgnore]
-        public BloodBank? BloodBank { get; set; }
     }
 }
