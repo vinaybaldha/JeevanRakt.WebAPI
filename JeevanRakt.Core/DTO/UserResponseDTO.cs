@@ -12,6 +12,7 @@ namespace JeevanRakt.Core.DTO
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
         public IList<string>? Role { get; set; }
+        public Guid Id { get; set; }
 
     }
 }

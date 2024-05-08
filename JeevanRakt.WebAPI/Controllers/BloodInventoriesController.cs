@@ -1,6 +1,5 @@
 ﻿using JeevanRakt.Core.Domain.Entities;
 using JeevanRakt.Infrastructure.DataBase;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

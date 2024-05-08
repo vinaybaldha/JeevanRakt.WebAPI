@@ -55,7 +55,7 @@ namespace JeevanRakt.WebAPI.Controllers
             {
                 return NotFound();
             }
-            var bloodBank = await _context.BloodBanks.Include(x=>x.Donors).Include(x => x.Recipients).FirstOrDefaultAsync(x=>x.BloodBankId==id);
+            var bloodBank = await _context.BloodBanks.Include(x=>x.Donors).Include(x => x.Recipients).Include(x=>x.BloodInventory).FirstOrDefaultAsync(x=>x.BloodBankId==id);
 
             if (bloodBank == null)
             {

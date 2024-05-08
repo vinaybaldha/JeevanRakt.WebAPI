@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using JeevanRakt.Core.Domain.Entities;
 using JeevanRakt.Infrastructure.DataBase;
@@ -121,6 +116,17 @@ namespace JeevanRakt.WebAPI.Controllers
         private bool RecipientExists(Guid id)
         {
             return (_context.Recipients?.Any(e => e.RecipientId == id)).GetValueOrDefault();
+        }
+
+        // GET: api/Donors/bloodbank
+        [HttpGet("bloodbank")]
+        public async Task<ActionResult<IEnumerable<Recipient>>> GetRecipientsById([FromQuery] Guid bloodbankId)
+        {
+            if (_context.Recipients == null)
+            {
+                return NotFound();
+            }
+            return await _context.Recipients.Where(x => x.BloodBankId == bloodbankId).ToListAsync();
         }
     }
 }

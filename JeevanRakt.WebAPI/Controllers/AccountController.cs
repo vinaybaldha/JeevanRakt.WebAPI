@@ -241,35 +241,37 @@ namespace JeevanRakt.WebAPI.Controllers
         }
 
         [HttpGet("users")]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
+        [AllowAnonymous]
         public IActionResult AllUser()
         {
             List<ApplicationUser> users = _userManager.Users.ToList();
 
             // Create a list to store user information along with their roles
-            //List<UserResponseDTO> usersWithRoles = new List<UserResponseDTO>();
+            List<UserResponseDTO> usersWithRoles = new List<UserResponseDTO>();
 
-            //// Iterate through each user to get their roles
-            //foreach (var user in users)
-            //{
-            //    // Get roles for the user
-            //    IList<string> roles = _userManager.GetRolesAsync(user).Result;
+            // Iterate through each user to get their roles
+            foreach (var user in users)
+            {
+                // Get roles for the user
+                IList<string> roles = _userManager.GetRolesAsync(user).Result;
 
-            //    // Create a DTO object to hold user information and roles
-            //    var userWithRoles = new UserResponseDTO
-            //    {
-                    
-            //        EmployeeName = user.EmployeeName,
-            //        Email = user.Email,
-            //        PhoneNumber = user.PhoneNumber,
-            //        Role = roles
-            //    };
+                // Create a DTO object to hold user information and roles
+                var userWithRoles = new UserResponseDTO
+                {
 
-            //    // Add the DTO object to the list
-            //    usersWithRoles.Add(userWithRoles);
-            //}
+                    EmployeeName = user.EmployeeName,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    Role = roles,
+                    Id = user.Id
+                };
 
-            return Ok(users);
+                // Add the DTO object to the list
+                usersWithRoles.Add(userWithRoles);
+            }
+
+            return Ok(usersWithRoles);
         }
 
         [HttpGet("totalusers")]
