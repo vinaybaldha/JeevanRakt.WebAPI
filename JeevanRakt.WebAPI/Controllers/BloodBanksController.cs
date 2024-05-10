@@ -1,11 +1,10 @@
 ﻿using JeevanRakt.Core.Domain.Entities;
 using JeevanRakt.Core.Domain.RepositoryContracts;
 using JeevanRakt.Infrastructure.DataBase;
-using JeevanRakt.Infrastructure.Repository;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace JeevanRakt.WebAPI.Controllers
 {
@@ -23,7 +22,7 @@ namespace JeevanRakt.WebAPI.Controllers
         }
 
         [HttpGet("nearest")]
-        [AllowAnonymous]
+        
         public IActionResult GetNearestBloodBank(double userLatitude, double userLongitude)
         {
             var nearestBloodBank = _bloodBankService.FindNearestBloodBank(userLatitude, userLongitude);
@@ -38,13 +37,49 @@ namespace JeevanRakt.WebAPI.Controllers
 
         // GET: api/BloodBanks
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BloodBank>>> GetBloodBanks()
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<BloodBank>>> GetBloodBanks(int page =1, int pageSize =10, string? filterOn=null, string? filterQuery=null, string? sortBy = null, bool isAccending = true)
         {
             if (_context.BloodBanks == null)
             {
                 return NotFound();
             }
-            return await _context.BloodBanks.Include(x=>x.Donors).Include(x=>x.Recipients).ToListAsync();
+
+            //filtering
+            var BloodBanks = _context.BloodBanks.AsQueryable();
+
+            if(string.IsNullOrWhiteSpace(filterOn) == false && string.IsNullOrWhiteSpace(filterQuery) == false)
+            {
+                if (filterOn.Equals("BloodBankName", StringComparison.OrdinalIgnoreCase))
+                {
+                    BloodBanks = BloodBanks.Where(x=>x.BloodBankName.Contains(filterQuery));
+                }
+
+                else if (filterOn.Equals("Address", StringComparison.OrdinalIgnoreCase))
+                {
+                    BloodBanks = BloodBanks.Where(x => x.Address.Contains(filterQuery));
+                }
+
+            }
+
+            //sorting
+            if(string.IsNullOrWhiteSpace(sortBy) == false)
+            {
+                if (sortBy.Equals("BloodBankName", StringComparison.OrdinalIgnoreCase))
+                {
+                    BloodBanks = isAccending ? BloodBanks.OrderBy(x=>x.BloodBankName) : BloodBanks.OrderByDescending(x => x.BloodBankName);
+                }
+
+                if (sortBy.Equals("Address", StringComparison.OrdinalIgnoreCase))
+                {
+                    BloodBanks = isAccending ? BloodBanks.OrderBy(x => x.Address) : BloodBanks.OrderByDescending(x => x.Address);
+                }
+
+            }
+
+            //pagination
+
+            return await BloodBanks.Skip((page-1)*pageSize).Take(pageSize).ToListAsync();
         }
 
         // GET: api/BloodBanks/5

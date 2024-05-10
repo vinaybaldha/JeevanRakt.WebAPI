@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using JeevanRakt.Core.Domain.Entities;
 using JeevanRakt.Infrastructure.DataBase;
 using Microsoft.AspNetCore.Authorization;
+using System.Drawing.Printing;
+using System.Globalization;
 
 namespace JeevanRakt.WebAPI.Controllers
 {
@@ -20,13 +22,88 @@ namespace JeevanRakt.WebAPI.Controllers
 
         // GET: api/Donors
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Donor>>> GetDonors()
+        public async Task<ActionResult<IEnumerable<Donor>>> GetDonors(int page = 1, int pageSize = 10, string? filterOn = null, string? filterQuery = null, string? sortBy = null, bool isAccending = true)
         {
           if (_context.Donors == null)
           {
               return NotFound();
           }
-            return await _context.Donors.ToListAsync();
+
+            //filtering
+            var Donors = _context.Donors.AsQueryable();
+
+            if (string.IsNullOrWhiteSpace(filterOn) == false && string.IsNullOrWhiteSpace(filterQuery) == false)
+            {
+                if (filterOn.Equals("DonorName", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = Donors.Where(x => x.DonorName.Contains(filterQuery));
+                }
+
+                else if (filterOn.Equals("DonorAge", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = Donors.Where(x => x.DonorAge.Equals(filterQuery));
+                }
+
+                else if (filterOn.Equals("DonorGender", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = Donors.Where(x => x.DonorGender.Contains(filterQuery));
+                }
+
+                else if (filterOn.Equals("DonorAddress", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = Donors.Where(x => x.DonorAddress.Contains(filterQuery));
+                }
+
+                else if (filterOn.Equals("DonorBloodType", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = Donors.Where(x => x.DonorBloodType.Contains(filterQuery));
+                }
+
+                else if (filterOn.Equals("DonorContactNumber", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = Donors.Where(x => x.DonorContactNumber.Contains(filterQuery));
+                }
+
+            }
+
+            //sorting
+            if (string.IsNullOrWhiteSpace(sortBy) == false)
+            {
+                if (sortBy.Equals("DonorName", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = isAccending ? Donors.OrderBy(x => x.DonorName) : Donors.OrderByDescending(x => x.DonorName);
+                }
+
+                if (sortBy.Equals("DonorAge", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = isAccending ? Donors.OrderBy(x => x.DonorAge) : Donors.OrderByDescending(x => x.DonorAge);
+                }
+
+                if (sortBy.Equals("DonorGender", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = isAccending ? Donors.OrderBy(x => x.DonorGender) : Donors.OrderByDescending(x => x.DonorGender);
+                }
+
+                if (sortBy.Equals("DonorAddress", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = isAccending ? Donors.OrderBy(x => x.DonorAddress) : Donors.OrderByDescending(x => x.DonorAddress);
+                }
+
+                if (sortBy.Equals("DonorBloodType", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = isAccending ? Donors.OrderBy(x => x.DonorBloodType) : Donors.OrderByDescending(x => x.DonorBloodType);
+                }
+
+                if (sortBy.Equals("DonorContactNumber", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = isAccending ? Donors.OrderBy(x => x.DonorContactNumber) : Donors.OrderByDescending(x => x.DonorContactNumber);
+                }
+
+            }
+
+            //pagination
+
+            return await Donors.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
         }
 
         // GET: api/Donors/5
@@ -128,13 +205,88 @@ namespace JeevanRakt.WebAPI.Controllers
         // GET: api/Donors/bloodbank
         [HttpGet("bloodbank")]
         [AllowAnonymous]
-        public async Task<ActionResult<IEnumerable<Donor>>> GetDonorsById([FromQuery] Guid bloodbankId)
+        public async Task<ActionResult<IEnumerable<Donor>>> GetDonorsById([FromQuery] Guid bloodbankId, int page = 1, int pageSize = 10, string? filterOn = null, string? filterQuery = null, string? sortBy = null, bool isAccending = true)
         {
             if (_context.Donors == null)
             {
                 return NotFound();
             }
-            return await _context.Donors.Where(x=>x.BloodBankId==bloodbankId).ToListAsync();
+
+            //filtering
+            var Donors = _context.Donors.Where(x => x.BloodBankId == bloodbankId).AsQueryable();
+
+            if (string.IsNullOrWhiteSpace(filterOn) == false && string.IsNullOrWhiteSpace(filterQuery) == false)
+            {
+                if (filterOn.Equals("DonorName", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = Donors.Where(x => x.DonorName.Contains(filterQuery));
+                }
+
+                else if (filterOn.Equals("DonorAge", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = Donors.Where(x => x.DonorAge.Equals(filterQuery));
+                }
+
+                else if (filterOn.Equals("DonorGender", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = Donors.Where(x => x.DonorGender.Contains(filterQuery));
+                }
+
+                else if (filterOn.Equals("DonorAddress", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = Donors.Where(x => x.DonorAddress.Contains(filterQuery));
+                }
+
+                else if (filterOn.Equals("DonorBloodType", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = Donors.Where(x => x.DonorBloodType.Contains(filterQuery));
+                }
+
+                else if (filterOn.Equals("DonorContactNumber", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = Donors.Where(x => x.DonorContactNumber.Contains(filterQuery));
+                }
+
+            }
+
+            //sorting
+            if (string.IsNullOrWhiteSpace(sortBy) == false)
+            {
+                if (sortBy.Equals("DonorName", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = isAccending ? Donors.OrderBy(x => x.DonorName) : Donors.OrderByDescending(x => x.DonorName);
+                }
+
+                if (sortBy.Equals("DonorAge", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = isAccending ? Donors.OrderBy(x => x.DonorAge) : Donors.OrderByDescending(x => x.DonorAge);
+                }
+
+                if (sortBy.Equals("DonorGender", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = isAccending ? Donors.OrderBy(x => x.DonorGender) : Donors.OrderByDescending(x => x.DonorGender);
+                }
+
+                if (sortBy.Equals("DonorAddress", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = isAccending ? Donors.OrderBy(x => x.DonorAddress) : Donors.OrderByDescending(x => x.DonorAddress);
+                }
+
+                if (sortBy.Equals("DonorBloodType", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = isAccending ? Donors.OrderBy(x => x.DonorBloodType) : Donors.OrderByDescending(x => x.DonorBloodType);
+                }
+
+                if (sortBy.Equals("DonorContactNumber", StringComparison.OrdinalIgnoreCase))
+                {
+                    Donors = isAccending ? Donors.OrderBy(x => x.DonorContactNumber) : Donors.OrderByDescending(x => x.DonorContactNumber);
+                }
+            }
+
+            //pagination
+
+            return await Donors.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
         }
 
 

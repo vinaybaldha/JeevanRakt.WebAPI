@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using JeevanRakt.Core.Domain.Entities;
 using JeevanRakt.Infrastructure.DataBase;
 using Microsoft.AspNetCore.Authorization;
+using System.Drawing.Printing;
+using System.Globalization;
 
 namespace JeevanRakt.WebAPI.Controllers
 {
@@ -20,13 +22,88 @@ namespace JeevanRakt.WebAPI.Controllers
 
         // GET: api/Recipients
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Recipient>>> GetRecipients()
+        public async Task<ActionResult<IEnumerable<Recipient>>> GetRecipients(int page = 1, int pageSize = 10, string? filterOn = null, string? filterQuery = null, string? sortBy = null, bool isAccending = true)
         {
           if (_context.Recipients == null)
           {
               return NotFound();
           }
-            return await _context.Recipients.ToListAsync();
+
+            //filtering
+            var Recipients = _context.Recipients.AsQueryable();
+
+            if (string.IsNullOrWhiteSpace(filterOn) == false && string.IsNullOrWhiteSpace(filterQuery) == false)
+            {
+                if (filterOn.Equals("RecipientName", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = Recipients.Where(x => x.RecipientName.Contains(filterQuery));
+                }
+
+                else if (filterOn.Equals("RecipientAge", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = Recipients.Where(x => x.RecipientAge.Equals(filterQuery));
+                }
+
+                else if (filterOn.Equals("RecipientGender", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = Recipients.Where(x => x.RecipientGender.Contains(filterQuery));
+                }
+
+                else if (filterOn.Equals("RecipientAddress", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = Recipients.Where(x => x.RecipientAddress.Contains(filterQuery));
+                }
+
+                else if (filterOn.Equals("RecipientBloodType", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = Recipients.Where(x => x.RecipientBloodType.Contains(filterQuery));
+                }
+
+                else if (filterOn.Equals("RecipientContactNumber", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = Recipients.Where(x => x.RecipientContactNumber.Contains(filterQuery));
+                }
+
+            }
+
+            //sorting
+            if (string.IsNullOrWhiteSpace(sortBy) == false)
+            {
+                if (sortBy.Equals("RecipientName", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = isAccending ? Recipients.OrderBy(x => x.RecipientName) : Recipients.OrderByDescending(x => x.RecipientName);
+                }
+
+                if (sortBy.Equals("RecipientAge", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = isAccending ? Recipients.OrderBy(x => x.RecipientAge) : Recipients.OrderByDescending(x => x.RecipientAge);
+                }
+
+                if (sortBy.Equals("RecipientGender", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = isAccending ? Recipients.OrderBy(x => x.RecipientGender) : Recipients.OrderByDescending(x => x.RecipientGender);
+                }
+
+                if (sortBy.Equals("RecipientAddress", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = isAccending ? Recipients.OrderBy(x => x.RecipientAddress) : Recipients.OrderByDescending(x => x.RecipientAddress);
+                }
+
+                if (sortBy.Equals("RecipientBloodType", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = isAccending ? Recipients.OrderBy(x => x.RecipientBloodType) : Recipients.OrderByDescending(x => x.RecipientBloodType);
+                }
+
+                if (sortBy.Equals("RecipientContactNumber", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = isAccending ? Recipients.OrderBy(x => x.RecipientContactNumber) : Recipients.OrderByDescending(x => x.RecipientContactNumber);
+                }
+
+            }
+
+            //pagination
+
+            return await Recipients.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
         }
 
         // GET: api/Recipients/5
@@ -120,13 +197,88 @@ namespace JeevanRakt.WebAPI.Controllers
 
         // GET: api/Donors/bloodbank
         [HttpGet("bloodbank")]
-        public async Task<ActionResult<IEnumerable<Recipient>>> GetRecipientsById([FromQuery] Guid bloodbankId)
+        public async Task<ActionResult<IEnumerable<Recipient>>> GetRecipientsById([FromQuery] Guid bloodbankId, int page = 1, int pageSize = 10, string? filterOn = null, string? filterQuery = null, string? sortBy = null, bool isAccending = true)
         {
             if (_context.Recipients == null)
             {
                 return NotFound();
             }
-            return await _context.Recipients.Where(x => x.BloodBankId == bloodbankId).ToListAsync();
+
+            //filtering
+            var Recipients = _context.Recipients.Where(x => x.BloodBankId == bloodbankId).AsQueryable();
+
+            if (string.IsNullOrWhiteSpace(filterOn) == false && string.IsNullOrWhiteSpace(filterQuery) == false)
+            {
+                if (filterOn.Equals("RecipientName", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = Recipients.Where(x => x.RecipientName.Contains(filterQuery));
+                }
+
+                else if (filterOn.Equals("RecipientAge", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = Recipients.Where(x => x.RecipientAge.Equals(filterQuery));
+                }
+
+                else if (filterOn.Equals("RecipientGender", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = Recipients.Where(x => x.RecipientGender.Contains(filterQuery));
+                }
+
+                else if (filterOn.Equals("RecipientAddress", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = Recipients.Where(x => x.RecipientAddress.Contains(filterQuery));
+                }
+
+                else if (filterOn.Equals("RecipientBloodType", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = Recipients.Where(x => x.RecipientBloodType.Contains(filterQuery));
+                }
+
+                else if (filterOn.Equals("RecipientContactNumber", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = Recipients.Where(x => x.RecipientContactNumber.Contains(filterQuery));
+                }
+
+            }
+
+            //sorting
+            if (string.IsNullOrWhiteSpace(sortBy) == false)
+            {
+                if (sortBy.Equals("RecipientName", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = isAccending ? Recipients.OrderBy(x => x.RecipientName) : Recipients.OrderByDescending(x => x.RecipientName);
+                }
+
+                if (sortBy.Equals("RecipientAge", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = isAccending ? Recipients.OrderBy(x => x.RecipientAge) : Recipients.OrderByDescending(x => x.RecipientAge);
+                }
+
+                if (sortBy.Equals("RecipientGender", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = isAccending ? Recipients.OrderBy(x => x.RecipientGender) : Recipients.OrderByDescending(x => x.RecipientGender);
+                }
+
+                if (sortBy.Equals("RecipientAddress", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = isAccending ? Recipients.OrderBy(x => x.RecipientAddress) : Recipients.OrderByDescending(x => x.RecipientAddress);
+                }
+
+                if (sortBy.Equals("RecipientBloodType", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = isAccending ? Recipients.OrderBy(x => x.RecipientBloodType) : Recipients.OrderByDescending(x => x.RecipientBloodType);
+                }
+
+                if (sortBy.Equals("RecipientContactNumber", StringComparison.OrdinalIgnoreCase))
+                {
+                    Recipients = isAccending ? Recipients.OrderBy(x => x.RecipientContactNumber) : Recipients.OrderByDescending(x => x.RecipientContactNumber);
+                }
+            }
+
+            //pagination
+
+            return await Recipients.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
         }
     }
 }
