@@ -60,6 +60,8 @@ builder.Services.AddTransient<IJwtService, JwtService>();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddScoped<IImageRepository, LocalImageRepository>();
 builder.Services.AddScoped<IBloodBankService, BloodBankService>();
+builder.Services.AddTransient<DataGeneraterService>();
+
 
 //add cors
 builder.Services.AddCors(option => option.AddPolicy("CorsPolicy", builder =>

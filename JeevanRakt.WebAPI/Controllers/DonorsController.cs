@@ -3,8 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using JeevanRakt.Core.Domain.Entities;
 using JeevanRakt.Infrastructure.DataBase;
 using Microsoft.AspNetCore.Authorization;
-using System.Drawing.Printing;
-using System.Globalization;
+using JeevanRakt.Core.Services;
 
 namespace JeevanRakt.WebAPI.Controllers
 {
@@ -14,10 +13,12 @@ namespace JeevanRakt.WebAPI.Controllers
     public class DonorsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly DataGeneraterService _dataGeneraterService;
 
-        public DonorsController(ApplicationDbContext context)
+        public DonorsController(ApplicationDbContext context, DataGeneraterService dataGeneraterService)
         {
             _context = context;
+            _dataGeneraterService = dataGeneraterService;
         }
 
         // GET: api/Donors
@@ -287,6 +288,29 @@ namespace JeevanRakt.WebAPI.Controllers
 
             return await Donors.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
+        }
+
+        [HttpGet("generate")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GenerateData()
+        {
+            List<BloodBank> bloodBanks = _context.BloodBanks.ToList();
+
+            foreach(var bloodBank in bloodBanks)
+            {
+                for (int i = 0; i < 100; i++)
+                {
+                    Donor donor = _dataGeneraterService.GenerateDonor();
+
+                    donor.BloodBankId = bloodBank.BloodBankId;
+                    _context.Donors.Add(donor);
+                }
+            }
+            await _context.SaveChangesAsync();
+
+            List<Donor> donors = await _context.Donors.ToListAsync();
+
+            return Ok(donors);
         }
 
 

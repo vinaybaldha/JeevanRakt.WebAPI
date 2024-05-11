@@ -150,7 +150,7 @@ namespace JeevanRakt.WebAPI.Controllers
             {
                 return BadRequest("something went wrong");
             }
-
+        
             AuthenticationResponse authenticationResponse = _jwtService.CreateJwtToken(user, roles.ToList());
 
             authenticationResponse.FilePath = user.FilePath;

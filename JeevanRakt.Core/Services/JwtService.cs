@@ -64,7 +64,7 @@ namespace JeevanRakt.Core.Services
 
             string token = tokenHandler.WriteToken(tokenGenerater);
 
-            return new AuthenticationResponse() { Email = user.Email, Expiration = expiration, EmployeeName = user.EmployeeName, Token = token, UserId = user.Id };
+            return new AuthenticationResponse() { Email = user.Email, Expiration = expiration, EmployeeName = user.EmployeeName, Token = token, UserId = user.Id, PhoneNumber = user.PhoneNumber };
         }
     }
 }
