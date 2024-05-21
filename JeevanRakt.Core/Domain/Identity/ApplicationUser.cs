@@ -16,5 +16,7 @@ namespace JeevanRakt.Core.Domain.Identity
 
         public string? FilePath { get; set; }
         public Guid? BloodBankId { get; set; }
+        public ICollection<Donor>? Donors { get; set; }
+        public ICollection<Recipient>? Recipients { get; set; }
     }
 }

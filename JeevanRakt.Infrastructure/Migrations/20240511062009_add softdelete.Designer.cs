@@ -4,6 +4,7 @@ using JeevanRakt.Infrastructure.DataBase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JeevanRakt.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240511062009_add softdelete")]
+    partial class addsoftdelete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -141,14 +144,9 @@ namespace JeevanRakt.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(1)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("DonorId");
 
                     b.HasIndex("BloodBankId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Donors");
                 });
@@ -202,10 +200,6 @@ namespace JeevanRakt.Infrastructure.Migrations
                     b.Property<Guid>("BloodBankId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("PaymentStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("RecStatus")
                         .IsRequired()
                         .HasColumnType("nvarchar(1)");
@@ -233,14 +227,9 @@ namespace JeevanRakt.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("RecipientId");
 
                     b.HasIndex("BloodBankId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Recipients");
                 });
@@ -379,16 +368,16 @@ namespace JeevanRakt.Infrastructure.Migrations
                         {
                             Id = new Guid("bba83451-9c4b-423b-91b6-254ff7bfd600"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "662843e5-9c9d-4195-802b-345242d7d8f8",
+                            ConcurrencyStamp = "a6f13f99-5d7a-40b9-a340-5bd75d47f0bb",
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
                             EmployeeName = "admin",
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEOMol5aDRoG+bFt3lLhR3M+X5SgQU4n05Z2hBGKrDcYZ7aDlLtz5wdkYn08HjGfFEA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKY8yKlk0rPuqR2i0x580RSu3Z7zDOswT/V6104BGWZHqV6OwJx7BG51PirPeSc0PA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "102865c0-e07b-4185-98eb-6b3f542f4274",
+                            SecurityStamp = "e454cd42-9c6e-4ef7-8731-86d8d0473bc3",
                             TwoFactorEnabled = false,
                             UserName = "admin@gmail.com"
                         });
@@ -523,15 +512,7 @@ namespace JeevanRakt.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("JeevanRakt.Core.Domain.Identity.ApplicationUser", "User")
-                        .WithMany("Donors")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("BloodBank");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("JeevanRakt.Core.Domain.Entities.Recipient", b =>
@@ -542,15 +523,7 @@ namespace JeevanRakt.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("JeevanRakt.Core.Domain.Identity.ApplicationUser", "User")
-                        .WithMany("Recipients")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("BloodBank");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -608,13 +581,6 @@ namespace JeevanRakt.Infrastructure.Migrations
                 {
                     b.Navigation("BloodInventory");
 
-                    b.Navigation("Donors");
-
-                    b.Navigation("Recipients");
-                });
-
-            modelBuilder.Entity("JeevanRakt.Core.Domain.Identity.ApplicationUser", b =>
-                {
                     b.Navigation("Donors");
 
                     b.Navigation("Recipients");

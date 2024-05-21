@@ -1,4 +1,6 @@
-﻿using System;
+﻿using JeevanRakt.Core.Domain.Identity;
+using JeevanRakt.Core.Domain.ModelInterfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -8,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace JeevanRakt.Core.Domain.Entities
 {
-    public class Donor
+    public class Donor:ISoftDelete
     {
        
         public Guid DonorId { get; set; }
@@ -18,9 +20,12 @@ namespace JeevanRakt.Core.Domain.Entities
         public string DonorAddress { get; set; }
         public string DonorBloodType { get; set; }
         public string DonorContactNumber { get; set; }
+        public char RecStatus { get; set; } = 'A';
 
         public Guid BloodBankId { get; set; }
         [JsonIgnore]
         public BloodBank? BloodBank { get; set; }
+        public Guid UserId { get; set; }
+        public ApplicationUser? User { get; set; }
     }
 }

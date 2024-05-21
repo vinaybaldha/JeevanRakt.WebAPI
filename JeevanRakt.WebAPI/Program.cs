@@ -1,5 +1,3 @@
-
-
 using JeevanRakt.Core.Domain.Identity;
 using JeevanRakt.Core.Domain.RepositoryContracts;
 using JeevanRakt.Core.ServiceContracts;
@@ -16,6 +14,8 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.SignalR;
+using Stripe;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,6 +61,9 @@ builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddScoped<IImageRepository, LocalImageRepository>();
 builder.Services.AddScoped<IBloodBankService, BloodBankService>();
 builder.Services.AddTransient<DataGeneraterService>();
+builder.Services.AddScoped<IDonorRepository, DonorRepository>();
+builder.Services.AddScoped<IRecipientRepository, RecipientRepository>();
+builder.Services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
 
 
 //add cors
@@ -105,6 +108,9 @@ builder.Services.AddAuthentication(options =>
 
         });
 
+//add httpContext
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSession();
 
 var app = builder.Build();
 
@@ -130,6 +136,10 @@ app.UseStaticFiles(
             RequestPath = "/Images"
         }
     );
+
+StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>();
+
+app.UseSession();
 
 app.UseAuthentication();
 

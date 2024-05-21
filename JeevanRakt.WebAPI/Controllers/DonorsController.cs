@@ -4,6 +4,11 @@ using JeevanRakt.Core.Domain.Entities;
 using JeevanRakt.Infrastructure.DataBase;
 using Microsoft.AspNetCore.Authorization;
 using JeevanRakt.Core.Services;
+using JeevanRakt.Core.Domain.RepositoryContracts;
+using System.Drawing;
+using JeevanRakt.Core.Domain.Identity;
+using Microsoft.AspNetCore.Identity;
+using Org.BouncyCastle.Cms;
 
 namespace JeevanRakt.WebAPI.Controllers
 {
@@ -14,113 +19,31 @@ namespace JeevanRakt.WebAPI.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly DataGeneraterService _dataGeneraterService;
+        private readonly IDonorRepository _donorRepository;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public DonorsController(ApplicationDbContext context, DataGeneraterService dataGeneraterService)
+        public DonorsController(ApplicationDbContext context, DataGeneraterService dataGeneraterService, IDonorRepository donorRepository, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _dataGeneraterService = dataGeneraterService;
+            _donorRepository = donorRepository;
+            _userManager = userManager;
         }
 
         // GET: api/Donors
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Donor>>> GetDonors(int page = 1, int pageSize = 10, string? filterOn = null, string? filterQuery = null, string? sortBy = null, bool isAccending = true)
         {
-          if (_context.Donors == null)
-          {
-              return NotFound();
-          }
+          IEnumerable<Donor> donors = await _donorRepository.GetDonorsAsync(page, pageSize, filterOn, filterQuery, sortBy, isAccending);
 
-            //filtering
-            var Donors = _context.Donors.AsQueryable();
-
-            if (string.IsNullOrWhiteSpace(filterOn) == false && string.IsNullOrWhiteSpace(filterQuery) == false)
-            {
-                if (filterOn.Equals("DonorName", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = Donors.Where(x => x.DonorName.Contains(filterQuery));
-                }
-
-                else if (filterOn.Equals("DonorAge", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = Donors.Where(x => x.DonorAge.Equals(filterQuery));
-                }
-
-                else if (filterOn.Equals("DonorGender", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = Donors.Where(x => x.DonorGender.Contains(filterQuery));
-                }
-
-                else if (filterOn.Equals("DonorAddress", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = Donors.Where(x => x.DonorAddress.Contains(filterQuery));
-                }
-
-                else if (filterOn.Equals("DonorBloodType", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = Donors.Where(x => x.DonorBloodType.Contains(filterQuery));
-                }
-
-                else if (filterOn.Equals("DonorContactNumber", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = Donors.Where(x => x.DonorContactNumber.Contains(filterQuery));
-                }
-
-            }
-
-            //sorting
-            if (string.IsNullOrWhiteSpace(sortBy) == false)
-            {
-                if (sortBy.Equals("DonorName", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = isAccending ? Donors.OrderBy(x => x.DonorName) : Donors.OrderByDescending(x => x.DonorName);
-                }
-
-                if (sortBy.Equals("DonorAge", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = isAccending ? Donors.OrderBy(x => x.DonorAge) : Donors.OrderByDescending(x => x.DonorAge);
-                }
-
-                if (sortBy.Equals("DonorGender", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = isAccending ? Donors.OrderBy(x => x.DonorGender) : Donors.OrderByDescending(x => x.DonorGender);
-                }
-
-                if (sortBy.Equals("DonorAddress", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = isAccending ? Donors.OrderBy(x => x.DonorAddress) : Donors.OrderByDescending(x => x.DonorAddress);
-                }
-
-                if (sortBy.Equals("DonorBloodType", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = isAccending ? Donors.OrderBy(x => x.DonorBloodType) : Donors.OrderByDescending(x => x.DonorBloodType);
-                }
-
-                if (sortBy.Equals("DonorContactNumber", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = isAccending ? Donors.OrderBy(x => x.DonorContactNumber) : Donors.OrderByDescending(x => x.DonorContactNumber);
-                }
-
-            }
-
-            //pagination
-
-            return await Donors.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            return Ok(donors);
         }
 
         // GET: api/Donors/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Donor>> GetDonor(Guid id)
         {
-          if (_context.Donors == null)
-          {
-              return NotFound();
-          }
-            var donor = await _context.Donors.FindAsync(id);
-
-            if (donor == null)
-            {
-                return NotFound();
-            }
+          Donor donor = await _donorRepository.GetDonorAsync(id);
 
             return donor;
         }
@@ -135,25 +58,18 @@ namespace JeevanRakt.WebAPI.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(donor).State = EntityState.Modified;
+            bool result = await _donorRepository.UpdateDonorAsync(donor);
 
-            try
+            if(result)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!DonorExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NoContent();
             }
 
-            return NoContent();
+            else
+            {
+                return BadRequest("update fail");
+            }
+           
         }
 
         // POST: api/Donors
@@ -161,46 +77,43 @@ namespace JeevanRakt.WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Donor>> PostDonor(Donor donor)
         {
-          if (_context.Donors == null)
-          {
-              return Problem("Entity set 'ApplicationDbContext.Donors'  is null.");
-          }
-            _context.Donors.Add(donor);
-            await _context.SaveChangesAsync();
+            ApplicationUser? user = await _userManager.GetUserAsync(User);
+            if (user == null) { BadRequest("user not found"); }
 
-            return CreatedAtAction("GetDonor", new { id = donor.DonorId }, donor);
+            donor.UserId = user.Id;
+
+            Donor donor1 = await _donorRepository.AddDonorAsync(donor);
+
+            if(donor1 == null)
+            {
+                BadRequest("data is not added");
+            }
+
+            return Ok(donor1);
         }
 
         // DELETE: api/Donors/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDonor(Guid id)
         {
-            if (_context.Donors == null)
-            {
-                return NotFound();
-            }
-            var donor = await _context.Donors.FindAsync(id);
-            if (donor == null)
-            {
-                return NotFound();
-            }
+            bool result = await _donorRepository.DeleteDonorAsync(id);
 
-            _context.Donors.Remove(donor);
-            await _context.SaveChangesAsync();
-
-            return Ok(donor);
+            if (result)
+            {
+               return BadRequest("delete fail");
+            }
+            else
+            {
+                return NoContent();
+            }
+          
         }
 
         [HttpGet("totaldonors")]
         public async Task<ActionResult<int>> GetTotalDonorsCount()
         {
-            var totalDonorsCount = await _context.Donors.CountAsync();
+            int totalDonorsCount = await _donorRepository.GetTotalDonorsCountAsync();
             return Ok(totalDonorsCount);
-        }
-
-        private bool DonorExists(Guid id)
-        {
-            return (_context.Donors?.Any(e => e.DonorId == id)).GetValueOrDefault();
         }
 
         // GET: api/Donors/bloodbank
@@ -208,85 +121,14 @@ namespace JeevanRakt.WebAPI.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<Donor>>> GetDonorsById([FromQuery] Guid bloodbankId, int page = 1, int pageSize = 10, string? filterOn = null, string? filterQuery = null, string? sortBy = null, bool isAccending = true)
         {
-            if (_context.Donors == null)
+            IEnumerable<Donor> donors = await _donorRepository.GetDonorsByBloodBankIdAsync(bloodbankId);
+
+            if(donors == null)
             {
-                return NotFound();
+                return BadRequest("get request fail");
             }
 
-            //filtering
-            var Donors = _context.Donors.Where(x => x.BloodBankId == bloodbankId).AsQueryable();
-
-            if (string.IsNullOrWhiteSpace(filterOn) == false && string.IsNullOrWhiteSpace(filterQuery) == false)
-            {
-                if (filterOn.Equals("DonorName", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = Donors.Where(x => x.DonorName.Contains(filterQuery));
-                }
-
-                else if (filterOn.Equals("DonorAge", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = Donors.Where(x => x.DonorAge.Equals(filterQuery));
-                }
-
-                else if (filterOn.Equals("DonorGender", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = Donors.Where(x => x.DonorGender.Contains(filterQuery));
-                }
-
-                else if (filterOn.Equals("DonorAddress", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = Donors.Where(x => x.DonorAddress.Contains(filterQuery));
-                }
-
-                else if (filterOn.Equals("DonorBloodType", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = Donors.Where(x => x.DonorBloodType.Contains(filterQuery));
-                }
-
-                else if (filterOn.Equals("DonorContactNumber", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = Donors.Where(x => x.DonorContactNumber.Contains(filterQuery));
-                }
-
-            }
-
-            //sorting
-            if (string.IsNullOrWhiteSpace(sortBy) == false)
-            {
-                if (sortBy.Equals("DonorName", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = isAccending ? Donors.OrderBy(x => x.DonorName) : Donors.OrderByDescending(x => x.DonorName);
-                }
-
-                if (sortBy.Equals("DonorAge", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = isAccending ? Donors.OrderBy(x => x.DonorAge) : Donors.OrderByDescending(x => x.DonorAge);
-                }
-
-                if (sortBy.Equals("DonorGender", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = isAccending ? Donors.OrderBy(x => x.DonorGender) : Donors.OrderByDescending(x => x.DonorGender);
-                }
-
-                if (sortBy.Equals("DonorAddress", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = isAccending ? Donors.OrderBy(x => x.DonorAddress) : Donors.OrderByDescending(x => x.DonorAddress);
-                }
-
-                if (sortBy.Equals("DonorBloodType", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = isAccending ? Donors.OrderBy(x => x.DonorBloodType) : Donors.OrderByDescending(x => x.DonorBloodType);
-                }
-
-                if (sortBy.Equals("DonorContactNumber", StringComparison.OrdinalIgnoreCase))
-                {
-                    Donors = isAccending ? Donors.OrderBy(x => x.DonorContactNumber) : Donors.OrderByDescending(x => x.DonorContactNumber);
-                }
-            }
-
-            //pagination
-
-            return await Donors.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            return Ok(donors);
 
         }
 
@@ -294,25 +136,12 @@ namespace JeevanRakt.WebAPI.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GenerateData()
         {
-            List<BloodBank> bloodBanks = _context.BloodBanks.ToList();
-
-            foreach(var bloodBank in bloodBanks)
-            {
-                for (int i = 0; i < 100; i++)
-                {
-                    Donor donor = _dataGeneraterService.GenerateDonor();
-
-                    donor.BloodBankId = bloodBank.BloodBankId;
-                    _context.Donors.Add(donor);
-                }
-            }
-            await _context.SaveChangesAsync();
+            await _donorRepository.GenerateTestDataAsync();
 
             List<Donor> donors = await _context.Donors.ToListAsync();
 
             return Ok(donors);
         }
-
 
     }
 }

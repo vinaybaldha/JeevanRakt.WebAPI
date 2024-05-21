@@ -3,13 +3,6 @@ using JeevanRakt.Core.Domain.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JeevanRakt.Infrastructure.DataBase
 {
@@ -28,6 +21,23 @@ namespace JeevanRakt.Infrastructure.DataBase
         public DbSet<Menu> Menus { get; set; }
         public DbSet<RoleAccess> RoleAccesses { get; set; }
         public DbSet<BloodInventory> BloodInventories { get; set; }
+
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        {
+            foreach(var entries in ChangeTracker.Entries())
+            {
+                var entity = entries.Entity;
+
+                if(entries.State == EntityState.Deleted)
+                {
+                    entries.State = EntityState.Modified;
+
+                    entity.GetType().GetProperty("RecStatus").SetValue(entity, 'D');
+                }
+            }
+
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
 
 
 

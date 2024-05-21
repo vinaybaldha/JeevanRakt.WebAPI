@@ -13,12 +13,10 @@ namespace JeevanRakt.WebAPI.Controllers
     public class BloodBanksController : ControllerBase
     {
         private readonly IBloodBankService _bloodBankService;
-        private readonly ApplicationDbContext _context;
 
-        public BloodBanksController(IBloodBankService bloodBankService, ApplicationDbContext context)
+        public BloodBanksController(IBloodBankService bloodBankService)
         {
             _bloodBankService = bloodBankService;
-            _context = context;
         }
 
         [HttpGet("nearest")]
@@ -40,64 +38,19 @@ namespace JeevanRakt.WebAPI.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<BloodBank>>> GetBloodBanks(int page =1, int pageSize =10, string? filterOn=null, string? filterQuery=null, string? sortBy = null, bool isAccending = true)
         {
-            if (_context.BloodBanks == null)
-            {
-                return NotFound();
-            }
 
-            //filtering
-            var BloodBanks = _context.BloodBanks.AsQueryable();
-
-            if(string.IsNullOrWhiteSpace(filterOn) == false && string.IsNullOrWhiteSpace(filterQuery) == false)
-            {
-                if (filterOn.Equals("BloodBankName", StringComparison.OrdinalIgnoreCase))
-                {
-                    BloodBanks = BloodBanks.Where(x=>x.BloodBankName.Contains(filterQuery));
-                }
-
-                else if (filterOn.Equals("Address", StringComparison.OrdinalIgnoreCase))
-                {
-                    BloodBanks = BloodBanks.Where(x => x.Address.Contains(filterQuery));
-                }
-
-            }
-
-            //sorting
-            if(string.IsNullOrWhiteSpace(sortBy) == false)
-            {
-                if (sortBy.Equals("BloodBankName", StringComparison.OrdinalIgnoreCase))
-                {
-                    BloodBanks = isAccending ? BloodBanks.OrderBy(x=>x.BloodBankName) : BloodBanks.OrderByDescending(x => x.BloodBankName);
-                }
-
-                if (sortBy.Equals("Address", StringComparison.OrdinalIgnoreCase))
-                {
-                    BloodBanks = isAccending ? BloodBanks.OrderBy(x => x.Address) : BloodBanks.OrderByDescending(x => x.Address);
-                }
-
-            }
-
-            //pagination
-
-            return await BloodBanks.Skip((page-1)*pageSize).Take(pageSize).ToListAsync();
+            IEnumerable<BloodBank> bloodBanks = await _bloodBankService.GetBloodBanksAsync(page,pageSize,filterOn,filterQuery,sortBy,isAccending);
+           
+            return Ok(bloodBanks);
         }
 
         // GET: api/BloodBanks/5
         [HttpGet("{id}")]
         public async Task<ActionResult<BloodBank>> GetBloodBank(Guid id)
         {
-            if (_context.BloodBanks == null)
-            {
-                return NotFound();
-            }
-            var bloodBank = await _context.BloodBanks.Include(x=>x.Donors).Include(x => x.Recipients).Include(x=>x.BloodInventory).FirstOrDefaultAsync(x=>x.BloodBankId==id);
+           BloodBank bloodBank = await _bloodBankService.GetBloodBankAsync(id);
 
-            if (bloodBank == null)
-            {
-                return NotFound();
-            }
-
-            return bloodBank;
+            return Ok(bloodBank);
         }
 
         // PUT: api/BloodBanks/5
@@ -110,25 +63,19 @@ namespace JeevanRakt.WebAPI.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(bloodBank).State = EntityState.Modified;
+            bool result = await _bloodBankService.UpdateBloodBankAsync(bloodBank);
 
-            try
+            if (result)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!BloodBankExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NoContent();
             }
 
-            return NoContent();
+            else
+            {
+                return BadRequest();
+            }
+
+            
         }
 
         // POST: api/BloodBanks
@@ -136,39 +83,29 @@ namespace JeevanRakt.WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<BloodBank>> PostBloodBank(BloodBank bloodBank)
         {
-            if (_context.BloodBanks == null)
-            {
-                return Problem("Entity set 'ApplicationDbContext.BloodBanks'  is null.");
-            }
-            _context.BloodBanks.Add(bloodBank);
-            await _context.SaveChangesAsync();
+            BloodBank bloodbank = await _bloodBankService.AddBloodBankAsync(bloodBank);
 
-            return CreatedAtAction("GetBloodBank", new { id = bloodBank.BloodBankId }, bloodBank);
+            return Ok(bloodbank);
         }
 
         // DELETE: api/BloodBanks/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBloodBank(Guid id)
         {
-            if (_context.BloodBanks == null)
+            bool result = await _bloodBankService.DeleteBloodBankAsync(id);
+
+            if (result)
             {
-                return NotFound();
-            }
-            var bloodBank = await _context.BloodBanks.FindAsync(id);
-            if (bloodBank == null)
-            {
-                return NotFound();
+                return NoContent();
             }
 
-            _context.BloodBanks.Remove(bloodBank);
-            await _context.SaveChangesAsync();
+            else
+            {
+                return BadRequest("error occured");
+            }
 
-            return NoContent();
+            
         }
 
-        private bool BloodBankExists(Guid id)
-        {
-            return (_context.BloodBanks?.Any(e => e.BloodBankId == id)).GetValueOrDefault();
-        }
     }
 }
