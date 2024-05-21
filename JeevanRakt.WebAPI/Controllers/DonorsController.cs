@@ -118,10 +118,9 @@ namespace JeevanRakt.WebAPI.Controllers
 
         // GET: api/Donors/bloodbank
         [HttpGet("bloodbank")]
-        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<Donor>>> GetDonorsById([FromQuery] Guid bloodbankId, int page = 1, int pageSize = 10, string? filterOn = null, string? filterQuery = null, string? sortBy = null, bool isAccending = true)
-        {
-            IEnumerable<Donor> donors = await _donorRepository.GetDonorsByBloodBankIdAsync(bloodbankId);
+       {
+            IEnumerable<Donor> donors = await _donorRepository.GetDonorsByBloodBankIdAsync(bloodbankId, page, pageSize, filterOn, filterQuery, sortBy, isAccending);
 
             if(donors == null)
             {
@@ -133,7 +132,6 @@ namespace JeevanRakt.WebAPI.Controllers
         }
 
         [HttpGet("generate")]
-        [AllowAnonymous]
         public async Task<IActionResult> GenerateData()
         {
             await _donorRepository.GenerateTestDataAsync();
@@ -141,6 +139,16 @@ namespace JeevanRakt.WebAPI.Controllers
             List<Donor> donors = await _context.Donors.ToListAsync();
 
             return Ok(donors);
+        }
+
+        [HttpGet("bloodbank/totaldonor")]
+        [AllowAnonymous]
+        public async Task<ActionResult<int>> GetTotalDonorsById([FromQuery] Guid bloodbankId)
+        {
+            int totaldonors = await _donorRepository.GetTotalDonor(bloodbankId);
+
+            return Ok(totaldonors);
+
         }
 
     }

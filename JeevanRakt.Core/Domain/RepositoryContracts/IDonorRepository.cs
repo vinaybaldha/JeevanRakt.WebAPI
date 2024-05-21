@@ -17,5 +17,6 @@ namespace JeevanRakt.Core.Domain.RepositoryContracts
         Task<int> GetTotalDonorsCountAsync();
         Task<IEnumerable<Donor>> GetDonorsByBloodBankIdAsync(Guid bloodbankId, int page = 1, int pageSize = 10, string filterOn = null, string filterQuery = null, string sortBy = null, bool isAscending = true);
         Task GenerateTestDataAsync();
+        Task<int> GetTotalDonor(Guid bloodbankId);
     }
 }

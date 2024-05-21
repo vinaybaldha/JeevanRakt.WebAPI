@@ -261,5 +261,10 @@ namespace JeevanRakt.Infrastructure.Repository
         {
             return _context.Donors.Any(e => e.DonorId == id);
         }
+
+        public async Task<int> GetTotalDonor(Guid bloodbankId)
+        {
+            return await _context.Donors.Where(x=>x.BloodBankId == bloodbankId).CountAsync();
+        }
     }
 }

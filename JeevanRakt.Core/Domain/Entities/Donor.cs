@@ -26,6 +26,7 @@ namespace JeevanRakt.Core.Domain.Entities
         [JsonIgnore]
         public BloodBank? BloodBank { get; set; }
         public Guid UserId { get; set; }
+        [JsonIgnore]
         public ApplicationUser? User { get; set; }
     }
 }
