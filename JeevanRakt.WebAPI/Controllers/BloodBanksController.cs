@@ -1,5 +1,6 @@
 ﻿using JeevanRakt.Core.Domain.Entities;
 using JeevanRakt.Core.Domain.RepositoryContracts;
+using JeevanRakt.Core.DTO;
 using JeevanRakt.Infrastructure.DataBase;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -39,7 +40,7 @@ namespace JeevanRakt.WebAPI.Controllers
         public async Task<ActionResult<IEnumerable<BloodBank>>> GetBloodBanks(int page =1, int pageSize =10, string? filterOn=null, string? filterQuery=null, string? sortBy = null, bool isAccending = true)
         {
 
-            IEnumerable<BloodBank> bloodBanks = await _bloodBankService.GetBloodBanksAsync(page,pageSize,filterOn,filterQuery,sortBy,isAccending);
+            bloodbankResponse bloodBanks = await _bloodBankService.GetBloodBanksAsync(page,pageSize,filterOn,filterQuery,sortBy,isAccending);
            
             return Ok(bloodBanks);
         }

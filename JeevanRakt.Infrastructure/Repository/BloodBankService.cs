@@ -1,13 +1,10 @@
 ﻿using JeevanRakt.Core.Domain.Entities;
 using JeevanRakt.Core.Domain.RepositoryContracts;
+using JeevanRakt.Core.DTO;
 using JeevanRakt.Core.Helper;
 using JeevanRakt.Infrastructure.DataBase;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace JeevanRakt.Infrastructure.Repository
 {
@@ -41,7 +38,7 @@ namespace JeevanRakt.Infrastructure.Repository
             return nearestBloodBank;
         }
 
-        public async Task<IEnumerable<BloodBank>> GetBloodBanksAsync(int page = 1, int pageSize = 10, string filterOn = null, string filterQuery = null, string sortBy = null, bool isAscending = true)
+        public async Task<bloodbankResponse> GetBloodBanksAsync(int page = 1, int pageSize = 10, string filterOn = null, string filterQuery = null, string sortBy = null, bool isAscending = true)
         {
             IQueryable<BloodBank> bloodBanksQuery = _dbContext.BloodBanks.Include(x=>x.Donors).Include(x=>x.Recipients).Include(x=>x.BloodInventory).Where(x => x.RecStatus == 'A');
 
@@ -69,7 +66,14 @@ namespace JeevanRakt.Infrastructure.Repository
                 }
             }
 
-            return await bloodBanksQuery.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            var totalCount = bloodBanksQuery.Count();
+            var totalPages = (int) Math.Ceiling((decimal)totalCount/pageSize);
+
+            List<BloodBank> bloodBanks = await bloodBanksQuery.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            bloodbankResponse bloodbankResponse = new bloodbankResponse() { BloodBanks = bloodBanks, Pages = totalPages };
+
+            return bloodbankResponse;
         }
 
         public async Task<BloodBank> AddBloodBankAsync(BloodBank bloodBank)
