@@ -275,6 +275,7 @@ namespace JeevanRakt.WebAPI.Controllers
         }
 
         [HttpGet("totalusers")]
+        [AllowAnonymous]
         public async Task<ActionResult<int>> GetTotalUsersCount()
         {
             var totalUsersCount = await _userManager.Users.CountAsync();

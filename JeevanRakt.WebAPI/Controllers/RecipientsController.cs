@@ -140,5 +140,13 @@ namespace JeevanRakt.WebAPI.Controllers
 
             return Ok(recipients);
         }
+
+        [HttpGet("totalrecipients")]
+        [AllowAnonymous]
+        public async Task<ActionResult<int>> GetTotalRecipientsCount()
+        {
+            int totalRecipientsCount = await _recipientRepository.GetTotalRecipientsCountAsync();
+            return Ok(totalRecipientsCount);
+        }
     }
 }

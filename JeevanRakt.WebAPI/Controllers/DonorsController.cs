@@ -100,16 +100,18 @@ namespace JeevanRakt.WebAPI.Controllers
 
             if (result)
             {
-               return BadRequest("delete fail");
+                return NoContent();
+              
             }
             else
             {
-                return NoContent();
+                return BadRequest("delete fail");
             }
           
         }
 
         [HttpGet("totaldonors")]
+        [AllowAnonymous]
         public async Task<ActionResult<int>> GetTotalDonorsCount()
         {
             int totalDonorsCount = await _donorRepository.GetTotalDonorsCountAsync();

@@ -18,6 +18,7 @@ namespace JeevanRakt.Core.Domain.RepositoryContracts
         Task<bool> DeleteRecipientAsync(Guid id);
         Task<IEnumerable<Recipient>> GetRecipientsByBloodBankIdAsync(Guid bloodbankId, int page = 1, int pageSize = 10, string filterOn = null, string filterQuery = null, string sortBy = null, bool isAscending = true);
         Task GenerateTestDataAsync();
+        Task<int> GetTotalRecipientsCountAsync();
 
     }
 }

@@ -291,5 +291,10 @@ namespace JeevanRakt.Core.Services
         {
             return await _context.Recipients.Where(x => x.RecStatus == 'A' && x.PaymentStatus == "pending" && x.UserId == user.Id).ToListAsync();
         }
+
+        public async Task<int> GetTotalRecipientsCountAsync()
+        {
+            return await _context.Recipients.CountAsync();
+        }
     }
 }
