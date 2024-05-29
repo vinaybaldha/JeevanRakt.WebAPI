@@ -113,8 +113,11 @@ namespace JeevanRakt.Infrastructure.Repository
 
         public async Task<Donor> AddDonorAsync(Donor donor)
         {
-            _context.Donors.Add(donor);
-            await _context.SaveChangesAsync();
+            //_context.Donors.Add(donor);
+            //await _context.SaveChangesAsync();
+
+            await _context.AddDonorAsync(donor);
+
             return donor;
         }
 
@@ -122,19 +125,35 @@ namespace JeevanRakt.Infrastructure.Repository
         {
             _context.Entry(donor).State = EntityState.Modified;
 
+            //try
+            //{
+            //    await _context.SaveChangesAsync();
+            //    return true;
+            //}
+            //catch (DbUpdateConcurrencyException)
+            //{
+            //    if (!DonorExists(donor.DonorId))
+            //    {
+            //        return false;
+            //    }
+            //    throw;
+            //}
             try
             {
-                await _context.SaveChangesAsync();
+                await _context.UpdateDonorAsync(donor);
                 return true;
             }
-            catch (DbUpdateConcurrencyException)
+            catch
             {
-                if (!DonorExists(donor.DonorId))
+                if(!DonorExists(donor.DonorId))
                 {
                     return false;
                 }
                 throw;
             }
+          
+
+            
         }
 
         public async Task<bool> DeleteDonorAsync(Guid id)
@@ -145,14 +164,18 @@ namespace JeevanRakt.Infrastructure.Repository
                 return false;
             }
 
-            _context.Donors.Remove(donor);
-            await _context.SaveChangesAsync();
+            //_context.Donors.Remove(donor);
+            //await _context.SaveChangesAsync();
+            _context.Entry(donor).State = EntityState.Deleted;
+            await _context.DeleteDonorAsync(id);
             return true;
         }
 
         public async Task<int> GetTotalDonorsCountAsync()
         {
             return await _context.Donors.CountAsync();
+
+            //return await _context.GetTotalDonorCountAsync();
         }
 
         public async Task<IEnumerable<Donor>> GetDonorsByBloodBankIdAsync(Guid bloodbankId, int page = 1, int pageSize = 10, string filterOn = null, string filterQuery = null, string sortBy = null, bool isAccending = true)

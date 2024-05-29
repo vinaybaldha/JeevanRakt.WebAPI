@@ -1,7 +1,9 @@
 ﻿using JeevanRakt.Core.Domain.Entities;
 using JeevanRakt.Core.Domain.Identity;
+using JeevanRakt.Core.DTO;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace JeevanRakt.Infrastructure.DataBase
@@ -21,6 +23,51 @@ namespace JeevanRakt.Infrastructure.DataBase
         public DbSet<Menu> Menus { get; set; }
         public DbSet<RoleAccess> RoleAccesses { get; set; }
         public DbSet<BloodInventory> BloodInventories { get; set; }
+
+        public async Task AddDonorAsync(Donor donor)
+        {
+            await Database.ExecuteSqlRawAsync("EXEC AddDonor @DonorId, @DonorName, @DonorAge, @DonorGender, @DonorAddress, @DonorBloodType, @DonorContactNumber, @RecStatus, @BloodBankId, @UserId",
+                new SqlParameter("@DonorId", donor.DonorId),
+                new SqlParameter("@DonorName", donor.DonorName),
+                new SqlParameter("@DonorAge", donor.DonorAge),
+                new SqlParameter("@DonorGender", donor.DonorGender),
+                new SqlParameter("@DonorAddress", donor.DonorAddress),
+                new SqlParameter("@DonorBloodType", donor.DonorBloodType),
+                new SqlParameter("@DonorContactNumber", donor.DonorContactNumber),
+                new SqlParameter("@RecStatus", donor.RecStatus),
+                new SqlParameter("@BloodBankId", donor.BloodBankId),
+                new SqlParameter("@UserId", donor.UserId));
+        }
+
+        public async Task UpdateDonorAsync(Donor donor)
+        {
+            await Database.ExecuteSqlRawAsync("EXEC UpdateDonor @DonorId, @DonorName, @DonorAge, @DonorGender, @DonorAddress, @DonorBloodType, @DonorContactNumber, @RecStatus, @BloodBankId, @UserId",
+                new SqlParameter("@DonorId", donor.DonorId),
+                new SqlParameter("@DonorName", donor.DonorName),
+                new SqlParameter("@DonorAge", donor.DonorAge),
+                new SqlParameter("@DonorGender", donor.DonorGender),
+                new SqlParameter("@DonorAddress", donor.DonorAddress),
+                new SqlParameter("@DonorBloodType", donor.DonorBloodType),
+                new SqlParameter("@DonorContactNumber", donor.DonorContactNumber),
+                new SqlParameter("@RecStatus", donor.RecStatus),
+                new SqlParameter("@BloodBankId", donor.BloodBankId),
+                new SqlParameter("@UserId", donor.UserId));
+        }
+
+        public async Task DeleteDonorAsync(Guid donorId)
+        {
+            await Database.ExecuteSqlRawAsync("EXEC DeleteDonor @DonorId",
+                new SqlParameter("@DonorId", donorId));
+        }
+
+        public async Task<int> GetTotalDonorCountAsync()
+        {
+            var result = await Set<DonorCountResult>()
+           .FromSqlRaw("EXEC GetTotalDonorCount")
+           .ToListAsync();
+
+            return result.FirstOrDefault()?.TotalDonorCount ?? 0;
+        }
 
         public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
         {
