@@ -18,18 +18,11 @@ namespace JeevanRakt.WebAPI.Controllers
             _productNotification = hubContext;
         }
 
-        [HttpGet]
+        [HttpPost]
         [AllowAnonymous]
-        public async Task UpdateProduct()
+        public async Task UpdateProduct(Notification notification)
         {
-           
-
-            await _productNotification.Clients.All.SendMessage(new Notification
-            {
-                ProductID = "1",
-                ProductName = "vinay",
-                Message = "Notification Added"
-            });
+            await _productNotification.Clients.All.SendMessage(notification);
         }
     }
 }
