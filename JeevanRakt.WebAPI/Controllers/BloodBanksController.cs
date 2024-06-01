@@ -108,5 +108,19 @@ namespace JeevanRakt.WebAPI.Controllers
             
         }
 
+
+        [HttpGet("totalbloodbanks")]
+        [AllowAnonymous]
+
+        public async Task<IActionResult> TotalBloodBanks()
+        {
+            if(_bloodBankService == null) { return BadRequest(); }
+
+            int count = await _bloodBankService.GetTotalBloodBankAsync();
+
+            return Ok(count);
+        }
+
+       
     }
 }

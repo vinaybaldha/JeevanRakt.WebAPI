@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace JeevanRakt.Infrastructure.DataBase
 {
@@ -67,6 +68,32 @@ namespace JeevanRakt.Infrastructure.DataBase
            .ToListAsync();
 
             return result.FirstOrDefault()?.TotalDonorCount ?? 0;
+        }
+
+        
+        //public async Task<int> GetTotalBloodStockCountAsync()
+        //{
+        //   var count = await Database.ExecuteSqlRawAsync("EXEC GetTotalBloodStock")
+        //        .Select(b => new { TotalBloodStock = b })
+        //        .FirstOrDefaultAsync();
+
+        //}
+
+        public async Task<int> GetTotalBloodStockAsync()
+        {
+            var parameterReturn = new SqlParameter
+            {
+                ParameterName = "ReturnValue",
+                SqlDbType = System.Data.SqlDbType.Int,
+                Direction = System.Data.ParameterDirection.Output,
+            };
+            var totalBloodStock = await Database.ExecuteSqlRawAsync("EXEC CountTotalBloodStock");
+            //.Select(b => new BloodStockResult { TotalBloodStock = (int)b.TotalBloodStock })
+            //.FirstOrDefaultAsync();
+
+            //return totalBloodStock?.TotalBloodStock ?? 0;
+          
+            return totalBloodStock;
         }
 
         public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)

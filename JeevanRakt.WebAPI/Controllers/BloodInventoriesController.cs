@@ -1,5 +1,6 @@
 ﻿using JeevanRakt.Core.Domain.Entities;
 using JeevanRakt.Infrastructure.DataBase;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -109,6 +110,26 @@ namespace JeevanRakt.WebAPI.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        // total bloodstock count
+        [HttpGet("totalbloodstocks")]
+        [AllowAnonymous]
+        public async Task<IActionResult> TotalBloodStockCount()
+        {
+            if (_context.BloodInventories == null)
+            {
+                return NotFound();
+            }
+
+            int totalcount = 0;
+            
+             totalcount = await _context.BloodInventories.SumAsync(x=>
+             
+                  x.A1 + x.A2 + x.B1 + x.B2 + x.O1 + x.O2 + x.AB1 + x.AB2
+             );
+
+            return Ok(totalcount);
         }
 
         private bool BloodInventoryExists(Guid id)

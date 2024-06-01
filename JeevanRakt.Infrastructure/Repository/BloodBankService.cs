@@ -125,5 +125,11 @@ namespace JeevanRakt.Infrastructure.Repository
                 .Include(x => x.BloodInventory)
                 .FirstOrDefaultAsync(x => x.BloodBankId == id);
         }
+
+        public async Task<int> GetTotalBloodBankAsync()
+        {
+            return await _dbContext.BloodBanks.CountAsync();
+        }
+
     }
 }
