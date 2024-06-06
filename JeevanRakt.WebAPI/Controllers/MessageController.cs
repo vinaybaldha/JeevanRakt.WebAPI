@@ -12,17 +12,20 @@ namespace JeevanRakt.WebAPI.Controllers
     public class MessageController : ControllerBase
     {
         private readonly IHubContext<ProductNotificationHub, INotificationHub> _productNotification;
+        private readonly ILogger<MessageController> _logger;
 
-        public MessageController(IHubContext<ProductNotificationHub, INotificationHub> hubContext)
+        public MessageController(IHubContext<ProductNotificationHub, INotificationHub> hubContext, ILogger<MessageController> logger)
         {
             _productNotification = hubContext;
+            _logger = logger;
         }
 
         [HttpPost]
         [AllowAnonymous]
         public async Task UpdateProduct(Notification notification)
         {
-            await _productNotification.Clients.All.SendMessage(notification);
+            _logger.LogInformation("Sending notification to Admin group");
+            await _productNotification.Clients.Group("Admin").SendMessage(notification);
         }
     }
 }
