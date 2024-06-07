@@ -1,10 +1,13 @@
 ﻿using JeevanRakt.Core.Domain.Entities;
 using JeevanRakt.Core.Domain.RepositoryContracts;
+using JeevanRakt.Core.Services;
 using JeevanRakt.Infrastructure.DataBase;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Stripe.Checkout;
 
 
@@ -17,11 +20,13 @@ namespace JeevanRakt.WebAPI.Controllers
         private IRecipientRepository _recipientRepository;
         private IHttpContextAccessor _httpContextAccessor;
         private ApplicationDbContext _context;
-        public CheckOutController(IRecipientRepository recipientRepository, IHttpContextAccessor httpContextAccessor, ApplicationDbContext context)
+        private readonly IHubContext<ProductNotificationHub, INotificationHub> _productNotification;
+        public CheckOutController(IRecipientRepository recipientRepository, IHttpContextAccessor httpContextAccessor, ApplicationDbContext context, IHubContext<ProductNotificationHub, INotificationHub> hubContext)
         {
             _recipientRepository = recipientRepository;
             _httpContextAccessor = httpContextAccessor;
             _context = context;
+            _productNotification = hubContext;
         }
 
         [HttpGet]
@@ -84,6 +89,12 @@ namespace JeevanRakt.WebAPI.Controllers
             var domain = "http://localhost:4200/";
 
             Recipient recipient = await _recipientRepository.GetRecipientAsync(recipientId);
+            Notification notification = new Notification()
+            {
+                Message = $"Blood Request Form {recipient.RecipientName}",
+                ProductID = recipient.RecipientId.ToString(),
+                ProductName = recipient.RecipientName,
+            };
 
 
             if (session_id == null)
@@ -97,7 +108,7 @@ namespace JeevanRakt.WebAPI.Controllers
             {
                 recipient.PaymentStatus = session.PaymentStatus;
                 await _context.SaveChangesAsync();
-
+                await _productNotification.Clients.Group("Admin").SendMessage(notification);
                 return Redirect($"{domain}success");
             }
 
