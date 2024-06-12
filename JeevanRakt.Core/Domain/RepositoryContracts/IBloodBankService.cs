@@ -18,5 +18,6 @@ namespace JeevanRakt.Core.Domain.RepositoryContracts
         Task<bool> DeleteBloodBankAsync(Guid id);
         bool BloodBankExists(Guid id);
         Task<int> GetTotalBloodBankAsync();
+        Task<bool> ApproveRequest(BloodBank bloodBank);
     }
 }

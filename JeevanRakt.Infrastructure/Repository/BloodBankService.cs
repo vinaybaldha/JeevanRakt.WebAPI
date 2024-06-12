@@ -3,6 +3,7 @@ using JeevanRakt.Core.Domain.RepositoryContracts;
 using JeevanRakt.Core.DTO;
 using JeevanRakt.Core.Helper;
 using JeevanRakt.Infrastructure.DataBase;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -40,7 +41,7 @@ namespace JeevanRakt.Infrastructure.Repository
 
         public async Task<bloodbankResponse> GetBloodBanksAsync(int page = 1, int pageSize = 10, string filterOn = null, string filterQuery = null, string sortBy = null, bool isAscending = true)
         {
-            IQueryable<BloodBank> bloodBanksQuery = _dbContext.BloodBanks.Include(x=>x.Donors).Include(x=>x.Recipients).Include(x=>x.BloodInventory).Where(x => x.RecStatus == 'A');
+            IQueryable<BloodBank> bloodBanksQuery = _dbContext.BloodBanks.Include(x=>x.Donors).Include(x=>x.Recipients).Include(x=>x.BloodInventory).Where(x => x.RecStatus == 'A' && x.CreateStatus == 'T');
 
             if (!string.IsNullOrWhiteSpace(filterOn) && !string.IsNullOrWhiteSpace(filterQuery))
             {
@@ -123,7 +124,7 @@ namespace JeevanRakt.Infrastructure.Repository
                 .Include(x => x.Donors)
                 .Include(x => x.Recipients)
                 .Include(x => x.BloodInventory)
-                .FirstOrDefaultAsync(x => x.BloodBankId == id);
+                .FirstOrDefaultAsync(x => x.BloodBankId == id && x.CreateStatus == 'T');
         }
 
         public async Task<int> GetTotalBloodBankAsync()
@@ -131,5 +132,15 @@ namespace JeevanRakt.Infrastructure.Repository
             return await _dbContext.BloodBanks.CountAsync();
         }
 
+        public async Task<bool> ApproveRequest(BloodBank bloodBank)
+        {
+            if(bloodBank == null) { return false; }
+
+            bloodBank.CreateStatus = 'T';
+
+           await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

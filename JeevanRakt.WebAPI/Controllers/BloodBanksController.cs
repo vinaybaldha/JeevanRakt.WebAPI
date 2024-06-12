@@ -121,6 +121,42 @@ namespace JeevanRakt.WebAPI.Controllers
             return Ok(count);
         }
 
-       
+
+        [HttpGet("approve")]
+        [Authorize(Roles ="Admin")]
+        public async Task<IActionResult> ApproveReq(Guid bloodBankId)
+        {
+            if (_bloodBankService == null) { return BadRequest(); }
+
+           BloodBank bloodBank = await _bloodBankService.GetBloodBankAsync(bloodBankId);
+
+            if(bloodBank == null)
+            {
+                return BadRequest("bloodbank not found");
+            }
+
+            bool result = await _bloodBankService.ApproveRequest(bloodBank);
+
+            if(result == false) { return BadRequest("bloodbank approve fail"); }
+
+            return Ok("bloodbank added");
+        }
+
+        [HttpGet("getpendingbloodbanks")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetPendingBloodBanks()
+        {
+            if (_bloodBankService == null) { return BadRequest(); }
+
+            if (bloodBank == null)
+            {
+                return BadRequest("bloodbank not found");
+            }
+
+            bloodBank.CreateStatus = 'T';
+
+            return Ok("bloodbank added");
+        }
+
     }
 }

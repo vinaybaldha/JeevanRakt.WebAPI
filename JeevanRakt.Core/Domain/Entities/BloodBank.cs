@@ -27,5 +27,6 @@ namespace JeevanRakt.Core.Domain.Entities
         [ForeignKey("BloodBankId")]
         public BloodInventory? BloodInventory { get; set; }
         public char RecStatus { get; set; } = 'A';
+        public char CreateStatus { get; set; } = 'F';
     }
 }
