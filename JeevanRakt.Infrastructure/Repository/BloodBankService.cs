@@ -142,5 +142,10 @@ namespace JeevanRakt.Infrastructure.Repository
 
             return true;
         }
+
+        public async Task<List<BloodBank>> GetPendingBloodBank()
+        {
+            return await _dbContext.BloodBanks.Where(x => x.CreateStatus == 'F').ToListAsync();
+        }
     }
 }

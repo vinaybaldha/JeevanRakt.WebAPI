@@ -139,7 +139,7 @@ namespace JeevanRakt.WebAPI.Controllers
 
             if(result == false) { return BadRequest("bloodbank approve fail"); }
 
-            return Ok("bloodbank added");
+            return Ok(bloodBank);
         }
 
         [HttpGet("getpendingbloodbanks")]
@@ -148,14 +148,10 @@ namespace JeevanRakt.WebAPI.Controllers
         {
             if (_bloodBankService == null) { return BadRequest(); }
 
-            if (bloodBank == null)
-            {
-                return BadRequest("bloodbank not found");
-            }
+            List<BloodBank> bloodBanks = await _bloodBankService.GetPendingBloodBank();
 
-            bloodBank.CreateStatus = 'T';
 
-            return Ok("bloodbank added");
+            return Ok(bloodBanks);
         }
 
     }

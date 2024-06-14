@@ -19,5 +19,6 @@ namespace JeevanRakt.Core.Domain.RepositoryContracts
         bool BloodBankExists(Guid id);
         Task<int> GetTotalBloodBankAsync();
         Task<bool> ApproveRequest(BloodBank bloodBank);
+        Task<List<BloodBank>> GetPendingBloodBank();
     }
 }
